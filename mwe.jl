@@ -1,59 +1,67 @@
 using Stipple, StippleUI
 using Genie.Renderer.Html
 using HTTP
+using FFMPEG_jll
 
 const IMGPATH = "img/demo.png"
 
-const SZ = 240 # width and height of the images
-const FPS = 10 # frames per second
+const SZ = 640 # width and height of the images
+const FPS = 5 # frames per second
 
-Base.@kwdef mutable struct Dashboard1 <: ReactiveModel # all this stuff with the model, is not really used here. I just keep it for the call to dashboard below
+start_camera() = ffmpeg() do exe
+    run(`$exe -y -hide_banner -loglevel error -f v4l2 -video_size $(SZ)x$SZ -i /dev/video0 -r $FPS -update 1 public/$IMGPATH`, wait = false)
+end
+
+start_camera(file) = ffmpeg() do exe
+    run(`$exe -y -hide_banner -loglevel error -f v4l2 -i /dev/video0 $file -s $(SZ)x$SZ -r $FPS -update 1 public/$IMGPATH`, wait = false)
+end
+
+
+
+const CAM_PROCESS = Ref(start_camera())
+Base.@kwdef mutable struct SkyRoom <: ReactiveModel
+    recording::R{Bool} = false
+    beetleid::R{String} = ""
+    comment::R{String} = ""
 end
 
 function restart()
     global model
 
-    model = Stipple.init(Dashboard1(), debounce=1)
+    model = Stipple.init(SkyRoom(), debounce=1)
+
+    on(model.recording) do recording
+        kill(CAM_PROCESS[])
+        sleep(1)
+        CAM_PROCESS[] = recording ? start_camera("a.mkv") : start_camera()
+    end
 end
 
 function ui()
     dashboard(vm(model), [
-        script(
-               """
-                       setInterval(function() {
-                       var img = document.getElementById("frame");
-                       img.src = "frame/" + new Date().getTime();
-                       }, 1000);
-               """
-              ),        
-        heading("Image Demo"),
-        row(cell(class="st-module", [
-            """
-                <img id="frame" src="frame" style="height: 140px; max-width: 140px" />
-            """
-            # the quasar thing doesn't actually create an img tag
-            # instead, it uses a div with a background image
-            # and it makes up its own ids, so you lose the "frame" id
-            # which is why the vanilla js doesn't work
-            # quasar(:img, id = "frame", src = "frame", style="height: 140px; max-width: 140px")
-        ]))
-    ], title = "Image Demo") |> html
-end
-
-function getframe()
-    # here's where you'd put your code to grab the image from the camera
-    # you'd then return an HTTP.Response object to stream the image back to the browser
-    # https://github.com/JuliaWeb/HTTP.jl
-    # this way, you never have to write anything to the disk
-    # that'll have the benefit of speeding things up (I/O is slow)
-    # and you won't have to clean up all of those frames from wherever they're being written
-    return HTTP.request("GET", "https://cataas.com/cat") 
+                          script(
+                                 """
+                                 setInterval(function() {
+                                 var img = document.getElementById("frame");
+                                 img.src = "$IMGPATH#" + new Date().getTime();
+                                 }, $(round(Int, 1000/FPS)));
+                                 """
+                                ),        
+                          heading("SkyRoom"),
+                          row(cell(class="st-module", [
+                                                       """
+                                                       <img id="frame" src="$IMGPATH" style="height: $(SZ)px; max-width: $(SZ)px" />
+                                                       """
+                                                      ])),
+                          row(cell(class="st-module", [
+                                                       p(toggle("Recording", fieldname = :recording)),
+                                                       p(["Beetle ID", input("", placeholder="Type in the ID of the beetle", @bind(:beetleid))]),
+                                                       p(["Comment", input("", placeholder="Type in any comments", @bind(:comment))])
+                                                      ]))
+                         ], title = "SkyRoom") |> html
 end
 
 route("/", ui)
-
-# this is our new route which returns the image
-route("/frame/:timestamp", getframe)
 
 Genie.config.server_host = "127.0.0.1"
 

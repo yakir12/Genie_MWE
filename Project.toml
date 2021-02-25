@@ -1,6 +1,8 @@
 [deps]
 FFMPEG_jll = "b22a6f82-2f65-5046-a5b2-351ab43fb4e5"
+FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
 Genie = "c43c736e-a2d1-11e8-161f-af95117fbd1e"
 HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
+ImageMagick = "6218d12a-5da1-5696-b52f-db25d2ecc6d1"
 Stipple = "4acbeb90-81a0-11ea-1966-bdaff8155998"
 StippleUI = "a3c5d34a-b254-4859-a8fa-b86abb7e84a3"
