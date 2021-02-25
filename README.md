@@ -8,12 +8,15 @@
 1. Clone this
 2. `cd` into here
 3. start Julia using the included `Project.toml` file with:
-   ```
-   $ julia --project=.
-   ```
+   ```
+   $ julia --project=.
+   ```
 4. Include the `mwe.jl` file:
-   ```julia
-   julia> include("mwe.jl")
-   ```
+   ```julia
+   julia> include("mwe.jl")
+   ```
 5. A webpage is automatically opened with a picture of your face
-6. Your face is sad but you can't see that becuase it's not updating (despite the fact that `public/img/demo.img` is indeed updating)
+6. Your face is sad but you can't see that because it's not updating (despite the fact that `public/img/demo.img` is indeed updating)
+
+## Notes
+Sorry, this is really not meant for anything serious: you'll have to `pkill ffmpeg` to stop the camera.
