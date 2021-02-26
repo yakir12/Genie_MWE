@@ -9,11 +9,11 @@ const SZ = 640 # width and height of the images
 const FPS = 5 # frames per second
 
 start_camera() = ffmpeg() do exe
-    run(`$exe -y -hide_banner -loglevel error -f v4l2 -video_size $(SZ)x$SZ -i /dev/video0 -r $FPS -update 1 public/$IMGPATH`, wait = false)
+    run(`$exe -y -hide_banner -loglevel error -f v4l2 -r $FPS -i /dev/video0 -vf "crop=in_h:in_h,scale=$(SZ)x$SZ" -update 1 public/$IMGPATH`, wait = false)
 end
 
 start_camera(file) = ffmpeg() do exe
-    run(`$exe -y -hide_banner -loglevel error -f v4l2 -i /dev/video0 $file -s $(SZ)x$SZ -r $FPS -update 1 public/$IMGPATH`, wait = false)
+    run(`$exe -y -hide_banner -loglevel error -f v4l2 -i /dev/video0 -filter_complex '[0:v]crop=in_h:in_h,split=2[out1][out2]' -map '[out1]' $file -map '[out2]' -s $(SZ)x$SZ -r $FPS -update 1 public/$IMGPATH`, wait = false)
 end
 
 
