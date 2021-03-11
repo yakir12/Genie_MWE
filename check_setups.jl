@@ -18,18 +18,18 @@ _check4s(dicts, fieldfun, thing, msg) = for dict in dicts
     end
 end
 
-_windid(x::Int) = 1 ≤ x ≤ 5
+_windid(x::Integer) = 1 ≤ x ≤ 5
 _windid(_) = false
-_windspeed(x::Int) = 0 ≤ x ≤ 255
+_windspeed(x::Integer) = 0 ≤ x ≤ 255
 _windspeed(_) = false
 
-_starintensity(x::Int) = 0 ≤ x ≤ 255
+_starintensity(x::Integer) = 0 ≤ x ≤ 255
 _starintensity(_) = false
 _starcardinal(x::String) = x ∈ ("SE", "NE", "SW", "NW")
 _starcardinal(_) = false
-_starradius(x::Int) = 0 ≤ x ≤ 300
+_starradius(x::Integer) = 0 ≤ x ≤ 300
 _starradius(_) = false
-_starelevation(x::Int) = 1 ≤ x ≤ 71
+_starelevation(x::Integer) = 1 ≤ x ≤ 71
 _starelevation(_) = false
 
 function _check1(x::Dict)
@@ -47,7 +47,6 @@ _check1(x) = ""
 
 _checksetups(::TOML.ParserError) = "bad TOML formatting"
 function _checksetups(ds)
-    @show ds
     isempty(ds) && return "file was empty"
     (haskey(ds, "title") && !isempty(ds["title"])) || return "missing experiment title"
     (haskey(ds, "experimenters") && !isempty(ds["experimenters"])) || return "missing experimenters' names"
