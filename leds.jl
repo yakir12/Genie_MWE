@@ -58,3 +58,11 @@ end
 
 # const ledarduino = (; pwm = Observable(UInt8[]))
 const ledarduino = LEDArduino()
+
+# ledarduino.pwm[] = rand(UInt8, 100);
+
+# ledarduino.pwm[] = rand(UInt8, 5);
+
+
+# encode(ledarduino.sp, rand(UInt8, 100))
+

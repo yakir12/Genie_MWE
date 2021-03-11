@@ -47,6 +47,7 @@ _check1(x) = ""
 
 _checksetups(::TOML.ParserError) = "bad TOML formatting"
 function _checksetups(ds)
+    @show ds
     isempty(ds) && return "file was empty"
     (haskey(ds, "title") && !isempty(ds["title"])) || return "missing experiment title"
     (haskey(ds, "experimenters") && !isempty(ds["experimenters"])) || return "missing experimenters' names"
