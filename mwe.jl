@@ -65,6 +65,8 @@ include("leds.jl")
 # end
 
 Base.@kwdef struct SkyRoom <: ReactiveModel
+    cameraon::R{Bool} = true
+    imageurl::R{String} = CAM.path
     kill::R{Bool} = false
     buttons::R{Vector{Dict{Symbol, Any}}} = Dict{Symbol, Any}[]
     pressed::R{Dict{String, Any}} = Dict{String, Any}("label" => "")
@@ -140,6 +142,11 @@ function restart()
 
     model = Stipple.init(SkyRoom(), debounce=1)
 
+    # js_created(model) != "" && push!(vue, :created    => Genie.Renderer.Json.JSONParser.JSONText("function () { $(js_created(model)) }"))
+
+    on(model.cameraon) do ison
+        ison ? play() : kill()
+    end
     onany(model.title, model.timestamp) do title, timestamp
         model.folder[] = DATADIR / string(title, "_", timestamp)
     end
@@ -157,46 +164,45 @@ function restart()
 
 end
 
-function Stipple.js_methods(model::SkyRoom)
-    """
-    badtoml () {
-    this.\$q.notify({
-    message: SkyRoom.msg,
-    color: 'negative'
-    })
+Stipple.js_methods(model::SkyRoom) = """
+    updateimage: function () { 
+        this.imageurl = "frame/" + new Date().getTime();
+    },
+    startcamera: function () { 
+        this.cameratimer = setInterval(this.updateimage, $(1000 ÷ CAM.fps));
+    },
+    stopcamera: function () { 
+        clearInterval(this.cameratimer);
+    },
+    badtoml: function () {
+    this.\$q.notify({message: SkyRoom.msg, color: 'negative'});
     }
-    """
-end
+"""
 
-# function Stipple.js_computed(model::SkyRoom)
-#     """
-#     {
-#     this.$q.dark.set(true);
-#     }
-#     """
-# end
+Stipple.js_created(model::SkyRoom) = """
+    if (this.cameraon) { this.startcamera() }
+"""
 
-
-Stipple.js_watch(SkyRoom) = "msg: {handler: 'badtoml'}"
+Stipple.js_watch(model::SkyRoom) = """
+    cameraon: function (newval, oldval) { 
+        this.stopcamera()
+        if (newval) { this.startcamera() }
+    },
+    msg: function () {
+    this.badtoml();
+    }
+"""
 
 function ui()
     m = dashboard(vm(model), [
-                              script(
-                                     """
-                                     setInterval(function() {
-                                     var img = document.getElementById("frame");
-                                     img.src = "frame/" + new Date().getTime();
-                                     }, $(1000 ÷ CAM.fps));
-                                     """
-                                    ),        
                               heading("SkyRoom"),
                               row(cell(class="st-module", [
                                                            p(h1(span("", @text(:title)))),
                                                           ])),
                               row(cell(class="st-module", [
-                                                           """
-                                                           <img id="frame" src="frame" style="height: $(CAM.sz)px; max-width: $(CAM.sz)px" />
-                                                           """
+                                                           quasar(:img, "", src=:imageurl, :basic, style="height: $(CAM.sz)px; max-width: $(CAM.sz)px"),
+                                                           p(toggle("Camera on", fieldname = :cameraon)),
+                                                           # """ <img id="frame" src="frame" style="height: $(CAM.sz)px; max-width: $(CAM.sz)px" /> """
                                                           ])),
                               row(cell(class="st-module", [
                                                            p(btn("Kill", @click(:kill), icon = "close", color="negative")),
@@ -238,11 +244,11 @@ route("upload", method = POST) do
     _try2update_buttons(d)
 end
 
-Genie.config.server_host = "0.0.0.0"
+Genie.config.server_host = "127.0.0.1"
 
 restart()
 
-up()
-# up(open_browser = true)
+# up()
+up(open_browser = true)
 
 
