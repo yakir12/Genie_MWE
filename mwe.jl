@@ -178,7 +178,9 @@ function restart()
 
     on(model.pressed) do d
         setup = Setup(d)
-        encode(LED_SP, pressed2arduinos(setup.stars))
+        msg = pressed2arduinos(setup.stars)
+        encode(LED_SP, msg)
+        println(msg)
     end
 end
 
