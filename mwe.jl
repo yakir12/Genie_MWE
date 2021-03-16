@@ -263,12 +263,12 @@ route("upload", method = POST) do
     _try2update_buttons(d)
 end
 
-# Genie.config.server_host = "0.0.0.0"
-Genie.config.server_host = "127.0.0.1"
+Genie.config.server_host = "0.0.0.0"
+# Genie.config.server_host = "127.0.0.1"
 
 restart()
 
-# up()
-up(open_browser = true)
+up()
+# up(open_browser = true)
 
 
