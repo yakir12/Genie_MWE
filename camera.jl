@@ -1,32 +1,49 @@
+const IMG_FILE = DATADIR / "frame.png"
+
 struct Camera
     process::Ref{Base.Process}
-    path::String
     sz::Int
     fps::Int
 end
 
-const CAM = Camera(Ref(run(`echo`)), tempname()*".png", 640, 5)
-
-Base.kill() = while !process_exited(CAM.process[])
-    kill(CAM.process[])
-    sleep(0.1)
-end
-
-function play()
-    kill()
-    ffmpeg() do exe
-        CAM.process[] = run(`$exe -y -hide_banner -loglevel error -f v4l2 -r $(CAM.fps) -i /dev/video0 -vf "crop=in_h:in_h,scale=$(CAM.sz)x$(CAM.sz)" -update 1 $(CAM.path)`, wait = false)
+function kill(c::Camera) 
+    attempts = 0
+    while !process_exited(c.process[]) && attempts < 5
+        kill(c.process[])
+        sleep(0.1)
+        attempts += 1
+    end
+    if attempts == 5
+        run(`pkill ffmpeg`)
     end
 end
 
-function record(file)
-    kill()
-    ffmpeg() do exe
-        CAM.process[] = run(`$exe -y -hide_banner -loglevel error -f v4l2 -i /dev/video0 -filter_complex '[0:v]crop=in_h:in_h,split=2[out1][out2]' -map '[out1]' $file -map '[out2]' -s $(CAM.sz)x$(CAM.sz) -r $(CAM.fps) -update 1 $(CAM.path)`, wait = false)
-    end
+play(fps, sz) = ffmpeg() do exe
+    run(`$exe -y -hide_banner -loglevel error -f v4l2 -r $fps -i /dev/video0 -vf "crop=in_h:in_h,scale=$(sz)x$sz" -update 1 $IMG_FILE`, wait = false)
 end
 
-snap() = HTTP.Messages.Response(200, read(CAM.path))
+function play(c::Camera)
+    kill(c)
+    c.process[] = play(c.fps, c.sz)
+end
+
+record(fps, sz, file) = ffmpeg() do exe
+    run(`$exe -y -hide_banner -loglevel error -f v4l2 -i /dev/video0 -filter_complex '[0:v]crop=in_h:in_h,split=2[out1][out2]' -map '[out1]' $file -map '[out2]' -s $(sz)x$sz -r $fps -update 1 $IMG_FILE`, wait = false)
+end
+
+function record(c::Camera, file)
+    kill(c)
+    c.process[] = record(c.fps, c.sz, file)
+end
+
+snap() = HTTP.Messages.Response(200, read(IMG_FILE))
+
+function Camera()
+    sz = 640
+    fps = 5
+    process = Ref(play(fps, sz))
+    Camera(process, sz, fps)
+end
 
 
 

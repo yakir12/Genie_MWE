@@ -1,18 +1,19 @@
 function killall()
-    kill()
-    # kill the LEDs and fans 
+    kill_lights()
+    # kill the fans 
 end
 
 function toggle_record(recording) 
     if recording
         model.disable_save[] = false
         model.timestamp[] = now()
-        turnon!()
+        turnon!(SETLOG)
         mkpath(model.folder[])
-        record(model.folder[] / "video.h264")
+        sleep(0.1)
+        record(CAM, model.folder[] / "video.h264")
         # record(allwind, model.folder[])
     else
-        play()
+        play(CAM)
     end
 end
 
@@ -22,11 +23,11 @@ function save()
     #     model.msg[] = "You haven't recorded a video yet, there is nothing to save"
     #     return nothing
     # end
-    md = Dict("title" => model.title[], "experimenters" => model.experimenters[], "recording_time" => model.timestamp[], "beetle_id" => model.beetleid[], "comment" => model.comment[], "setuplog" => getlog())
     open(model.folder[] / "metadata.toml", "w") do io
+        md = Dict("title" => model.title[], "experimenters" => model.experimenters[], "recording_time" => model.timestamp[], "beetle_id" => model.beetleid[], "comment" => model.comment[], "setuplog" => getlog(SETLOG))
         TOML.print(io, md)
     end
-    turnoff!()
+    turnoff!(SETLOG)
     model.disable_save[] = true
     model.comment[] = ""
     model.beetleid[] = ""

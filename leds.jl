@@ -1,6 +1,4 @@
-# const brightness = 1
-const ledport = nicolas ? "/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_757353036313519070B1-if00" : "/dev/serial/by-id/usb-1a86_USB2.0-Serial-if00-port0"
-# const ledport = "/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_95735353032351317061-if00"
+const LIGHTSOUT = zeros(UInt8, 5)
 
 struct LED
     ind1::UInt8
@@ -10,7 +8,7 @@ struct LED
     b::UInt8
 end
 
-LED(i::Int, r, g, b) = LED(reinterpret(UInt8, [UInt16(i)])..., r, g, b)
+LED(i::Integer, r, g, b) = LED(reinterpret(UInt8, [UInt16(i)])..., r, g, b)
 
 function star2leds(s::Star)
     ledsperstrip = 150
@@ -32,37 +30,17 @@ function star2leds(s::Star)
 end
 
 function pressed2arduinos(stars::Vector{Star})
-    isempty(stars) && return zeros(UInt8, 5)
+    isempty(stars) && return LIGHTSOUT
     msg = UInt8[]
     for star in stars, led in star2leds(star), field in fieldnames(LED)
         push!(msg, getfield(led, field))
     end
     return msg
 end
-pressed2arduinos(setup::Setup) = pressed2arduinos(setup.stars)
-pressed2arduinos(d::Dict) = pressed2arduinos(Setup(d))
 
-mutable struct LEDArduino <: AbstractArduino
-    port::String
-    sp::SerialPort
-    pwm::Observable{Vector{UInt8}}
-    function LEDArduino()
-        sp = LibSerialPort.open(ledport, baudrate)
-        pwm = Observable(UInt8[0, 0])
-        on(pwm) do x
-            encode(sp, x)
-        end
-        new(ledport, sp, pwm)
-    end
-end
+port = nicolas ? "/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_757353036313519070B1-if00" : "/dev/serial/by-id/usb-1a86_USB2.0-Serial-if00-port0"
+# port = "/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_95735353032351F0F0F0-if00"
+const LED_SP = LibSerialPort.open(port, 9600)
 
-# const ledarduino = (; pwm = Observable(UInt8[]))
-const ledarduino = LEDArduino()
-
-# ledarduino.pwm[] = rand(UInt8, 100);
-
-# ledarduino.pwm[] = rand(UInt8, 5);
-
-
-# encode(ledarduino.sp, rand(UInt8, 100))
+kill_lights() = encode(LED_SP, LIGHTSOUT)
 

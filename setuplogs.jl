@@ -15,20 +15,18 @@ struct SetupLog
     end
 end
 
-const SETLOG = SetupLog()
-
-function turnon!()
-    turnoff!()
-    SETLOG._of[] = on(SETLOG.buffer, weak = true) do x
+function turnon!(sl)
+    turnoff!(sl)
+    sl._of[] = on(sl.buffer, weak = true) do x
         x["timestamp"] = now()
-        push!(SETLOG.log, x)
+        push!(sl.log, x)
     end
-    SETLOG.buffer[] = SETLOG.buffer[]
+    notify!(sl.buffer)
 end
 
-function turnoff!()
-    off(SETLOG._of[])
-    empty!(SETLOG.log)
+function turnoff!(sl)
+    off(sl._of[])
+    empty!(sl.log)
 end
 
-getlog() = SETLOG.log
+getlog(sl) = sl.log

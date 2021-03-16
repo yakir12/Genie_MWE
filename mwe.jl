@@ -1,4 +1,8 @@
 # TODO
+# sort out the global/const thing, especially with the arduino ports getting stuck
+# identify and report the issue with the button toggle array not loading without a page refresh
+# maybe figure out how to avoide the cameraon Observable, it isn't really used here at all
+#
 # Important:
 # mount and try everything on the RPIs for real (how to connect it to the picam)
 # connect all the LED and Arduino mechanism when the buttons are done
@@ -66,7 +70,7 @@ include("leds.jl")
 
 Base.@kwdef struct SkyRoom <: ReactiveModel
     cameraon::R{Bool} = true
-    imageurl::R{String} = CAM.path
+    imageurl::R{String} = IMG_FILE
     kill::R{Bool} = false
     buttons::R{Vector{Dict{Symbol, Any}}} = Dict{Symbol, Any}[]
     pressed::R{Dict{String, Any}} = Dict{String, Any}("label" => "")
@@ -133,20 +137,33 @@ end
 #     end
 # end
 
+function remove_dead_clients(timer)
+    for (ch, clients) in Genie.WebChannels.subscriptions()
+        for cl in clients
+            try
+                Genie.WebChannels.message(cl, "")
+            catch ex
+                @info "removing dead client: $cl from $ch"
+                Genie.WebChannels.pop_subscription(cl, ch)
+            end
+        end
+    end
+end
+
+
+const SETLOG = SetupLog()
+const CAM = Camera()
+const model = Stipple.init(SkyRoom(), debounce=1) 
+const timer = Ref(Timer(1.0))
 
 function restart()
 
-    global model
+    close(timer[])
+    timer[] = Timer(remove_dead_clients, 1; interval=60)
 
-    play()
-
-    model = Stipple.init(SkyRoom(), debounce=1)
-
-    # js_created(model) != "" && push!(vue, :created    => Genie.Renderer.Json.JSONParser.JSONText("function () { $(js_created(model)) }"))
-
-    on(model.cameraon) do ison
-        ison ? play() : kill()
-    end
+    # on(model.cameraon) do ison
+    #     ison ? play(CAM) : kill(CAM)
+    # end
     onany(model.title, model.timestamp) do title, timestamp
         model.folder[] = DATADIR / string(title, "_", timestamp)
     end
@@ -159,38 +176,40 @@ function restart()
     onbutton(save, model.save)
     onbutton(backup, model.backup)
 
-    # on(println, model.pressed)
-    map!(pressed2arduinos, ledarduino.pwm, model.pressed)
-
+    on(model.pressed) do d
+        setup = Setup(d)
+        encode(LED_SP, pressed2arduinos(setup.stars))
+    end
 end
 
 Stipple.js_methods(model::SkyRoom) = """
-    updateimage: function () { 
-        this.imageurl = "frame/" + new Date().getTime();
-    },
-    startcamera: function () { 
-        this.cameratimer = setInterval(this.updateimage, $(1000 ÷ CAM.fps));
-    },
-    stopcamera: function () { 
-        clearInterval(this.cameratimer);
-    },
-    badtoml: function () {
-    this.\$q.notify({message: SkyRoom.msg, color: 'negative'});
-    }
+updateimage: function () { 
+this.imageurl = "frame/" + new Date().getTime();
+},
+startcamera: function () { 
+this.cameratimer = setInterval(this.updateimage, $(1000 ÷ CAM.fps));
+},
+stopcamera: function () { 
+clearInterval(this.cameratimer);
+},
+badtoml: function () {
+this.\$q.notify({message: SkyRoom.msg, color: 'negative'});
+}
 """
 
 Stipple.js_created(model::SkyRoom) = """
-    if (this.cameraon) { this.startcamera() }
+if (this.cameraon) { this.startcamera() };
 """
+# this.\$q.dark.set(true);
 
 Stipple.js_watch(model::SkyRoom) = """
-    cameraon: function (newval, oldval) { 
-        this.stopcamera()
-        if (newval) { this.startcamera() }
-    },
-    msg: function () {
-    this.badtoml();
-    }
+cameraon: function (newval, oldval) { 
+this.stopcamera()
+if (newval) { this.startcamera() }
+},
+msg: function () {
+this.badtoml();
+}
 """
 
 function ui()
@@ -201,7 +220,7 @@ function ui()
                                                           ])),
                               row(cell(class="st-module", [
                                                            quasar(:img, "", src=:imageurl, :basic, style="height: $(CAM.sz)px; max-width: $(CAM.sz)px"),
-                                                           p(toggle("Camera on", fieldname = :cameraon)),
+                                                           # p(toggle("Camera on", fieldname = :cameraon)),
                                                            # """ <img id="frame" src="frame" style="height: $(CAM.sz)px; max-width: $(CAM.sz)px" /> """
                                                           ])),
                               row(cell(class="st-module", [
@@ -210,7 +229,7 @@ function ui()
                                                            p(quasar(:btn__toggle, "", @bind("pressed"), color = "secondary", toggle__color="primary", :multiple, options=:buttons))
                                                           ])),
                               row(cell(class="st-module", [
-                                                           p([toggle("", fieldname = :recording, checked__icon="fiber_manual_record", unchecked__icon="play_circle"), span("", @text(:record_label))]),
+                                                           p([toggle("", fieldname = :recording, checked__icon="fiber_manual_record", unchecked__icon="stop"), span("", @text(:record_label))]),
                                                            p(["Beetle ID ", input("", label = "ID", placeholder="Type in the ID of the beetle", @bind(:beetleid))]),
                                                            p(["Comment ", input("", placeholder="Type in any comments", @bind(:comment), :autogrow)]),
                                                            p(btn("Save", @click(:save), disabled = :disable_save, icon = "save", color="primary")),
@@ -244,8 +263,8 @@ route("upload", method = POST) do
     _try2update_buttons(d)
 end
 
-Genie.config.server_host = "0.0.0.0"
-# Genie.config.server_host = "127.0.0.1"
+# Genie.config.server_host = "0.0.0.0"
+Genie.config.server_host = "127.0.0.1"
 
 restart()
 
