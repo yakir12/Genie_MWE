@@ -21,6 +21,7 @@ function star2leds(s::Star)
     secondstrip = striphalf ≥ 3
     extra = secondstrip ? ledsperstrip : 0
     μ = base + extra
+    println(μ)
     m = secondstrip ? ledsperstrip : 0
     M = secondstrip ? ledsperstrip + liveleds - 1 : liveleds - 1
     i1 = max(m, μ - s.radius)
