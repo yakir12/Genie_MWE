@@ -22,7 +22,7 @@ function star2leds(s::Star)
     extra = secondstrip ? ledsperstrip - 1 : 0
     μ = base + extra
     m = secondstrip ? ledsperstrip : 0
-    M = secondstrip ? 2ledsperstrip - 1 : ledsperstrip - 1
+    M = secondstrip ? ledsperstrip + liveleds - 1 : liveleds - 1
     i1 = max(m, μ - s.radius)
     i2 = min(M, μ + s.radius)
     indices = replace(i1:i2, centerled => centerled + ledsperstrip - 1)
