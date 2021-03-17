@@ -8,7 +8,7 @@ struct LED
     b::UInt8
 end
 
-LED(i::Integer, r, g, b) = LED(reinterpret(UInt8, [UInt16(i)])..., r, g, b)
+LED(i::Integer, r, g, b) = LED(reverse(reinterpret(UInt8, [UInt16(i)]))..., r, g, b)
 
 function star2leds(s::Star)
     ledsperstrip = 150
