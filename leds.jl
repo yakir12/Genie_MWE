@@ -1,19 +1,19 @@
 const ledsperstrip = 150
 deadleds = 9
 const liveleds = ledsperstrip - deadleds
-const centerled = (liveleds - 1)÷2
+const centerled = (liveleds - 1)÷2 + 1
 const LEDS = zeros(UInt8, 2ledsperstrip)
 
 reset_l() = fill!(LEDS, 0x00)
 
 function update_l(s::Star)
     striphalf = Int(s.cardinal)
-    base = isodd(striphalf) ?  s.elevation - 1 : liveleds - s.elevation
+    base = isodd(striphalf) ?  s.elevation : liveleds - s.elevation + 1
     secondstrip = striphalf ≥ 3
-    extra = secondstrip ? ledsperstrip - 1 : 0
+    extra = secondstrip ? ledsperstrip : 0
     μ = base + extra
-    m = secondstrip ? ledsperstrip - 1 : 0
-    M = secondstrip ? ledsperstrip + liveleds - 1 : liveleds - 1
+    m = secondstrip ? ledsperstrip + 1 : 1
+    M = secondstrip ? ledsperstrip + liveleds : liveleds 
     i1 = max(m, μ - s.radius)
     i2 = min(M, μ + s.radius)
     for i in i1:i2
@@ -22,7 +22,7 @@ function update_l(s::Star)
 end
 
 fixcenter_l() = if LEDS[centerled] > 0
-    LEDS[centerled + ledsperstrip - 1] = LEDS[centerled]
+    LEDS[centerled + ledsperstrip] = LEDS[centerled]
     LEDS[centerled] = 0x00
 end
 
