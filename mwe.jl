@@ -180,8 +180,11 @@ function restart()
 
     on(model.pressed) do d
         setup = Setup(d)
-        msg = pressed2arduinos(setup.stars)
-        encode(LED_SP, msg)
+        reset_l()
+        update_l.(setup.stars)
+        # update_l.(setup.milky_ways)
+        fixcenter_l()
+        encode(LED_SP, LEDS)
     end
 end
 
