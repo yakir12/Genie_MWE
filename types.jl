@@ -3,16 +3,13 @@
 struct Star
     cardinal::Cardinal
     elevation::Int
-    r::Int
-    g::Int
-    b::Int
+    intensity::Int
     radius::Int
 end
 
-_getrgb(d) = haskey(d, "intensity") ? (0, d["intensity"], 0) : (d["red"], d["green"], d["blue"])
 _getcardinal(txt) = Cardinal(findfirst(==(txt), string.(instances(Cardinal))))
 
-Star(d::Dict) = Star(_getcardinal(d["cardinal"]), d["elevation"], _getrgb(d)..., get(d, "radius", 0))
+Star(d::Dict) = Star(_getcardinal(d["cardinal"]), d["elevation"], d["intensity"], get(d, "radius", 0))
 
 struct Wind
     id::Int
