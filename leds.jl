@@ -18,11 +18,11 @@ function star2leds(s::Star)
 
     striphalf = Int(s.cardinal)
     base = isodd(striphalf) ?  s.elevation - 1 : liveleds - s.elevation
-    secondstrip = Int(striphalf ≥ 3)
-    extra = secondstrip*ledsperstrip - 1
+    secondstrip = striphalf ≥ 3
+    extra = secondstrip ? ledsperstrip - 1 : 0
     μ = base + extra
-    m = secondstrip*ledsperstrip
-    M = (1 + secondstrip)*ledsperstrip - 1
+    m = secondstrip ? ledsperstrip : 0
+    M = secondstrip ? 2ledsperstrip - 1 : ledsperstrip - 1
     i1 = max(m, μ - s.radius)
     i2 = min(M, μ + s.radius)
     indices = replace(i1:i2, centerled => centerled + ledsperstrip - 1)
