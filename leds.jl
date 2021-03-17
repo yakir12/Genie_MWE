@@ -21,11 +21,13 @@ function star2leds(s::Star)
     secondstrip = striphalf ≥ 3
     extra = secondstrip ? ledsperstrip : 0
     μ = base + extra
+    @show μ
     m = secondstrip ? ledsperstrip : 0
     M = secondstrip ? ledsperstrip + liveleds - 1 : liveleds - 1
     i1 = max(m, μ - s.radius)
     i2 = min(M, μ + s.radius)
     indices = replace(i1:i2, centerled => centerled + ledsperstrip - 1)
+    @show indices[1]
     LED.(indices, s.r, s.g, s.b)
 end
 

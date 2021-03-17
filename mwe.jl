@@ -182,7 +182,6 @@ function restart()
         setup = Setup(d)
         msg = pressed2arduinos(setup.stars)
         encode(LED_SP, msg)
-        println(msg)
     end
 end
 
