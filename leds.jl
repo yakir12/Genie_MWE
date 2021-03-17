@@ -10,10 +10,10 @@ function update_l(s::Star)
     striphalf = Int(s.cardinal)
     base = isodd(striphalf) ?  s.elevation : liveleds - s.elevation + 1
     secondstrip = striphalf ≥ 3
-    extra = secondstrip ? ledsperstrip : 0
+    extra = secondstrip ? ledsperstrip -1 : 0
     μ = base + extra
-    m = secondstrip ? ledsperstrip + 1 : 1
-    M = secondstrip ? ledsperstrip + liveleds : liveleds 
+    m = secondstrip ? ledsperstrip : 1
+    M = secondstrip ? ledsperstrip + liveleds - 1 : liveleds 
     i1 = max(m, μ - s.radius)
     i2 = min(M, μ + s.radius)
     for i in i1:i2
@@ -22,7 +22,7 @@ function update_l(s::Star)
 end
 
 fixcenter_l() = if LEDS[centerled] > 0
-    LEDS[centerled + ledsperstrip] = LEDS[centerled]
+    LEDS[centerled + ledsperstrip - 1] = LEDS[centerled]
     LEDS[centerled] = 0x00
 end
 
