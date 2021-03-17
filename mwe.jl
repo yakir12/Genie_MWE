@@ -1,4 +1,6 @@
 # TODO
+# when kill is pressed, it would be good if the toggle buttons reset somehow
+# there is a weird shift in leds, fix thecenter at least
 # sort out the global/const thing, especially with the arduino ports getting stuck
 # identify and report the issue with the button toggle array not loading without a page refresh
 # maybe figure out how to avoide the cameraon Observable, it isn't really used here at all
