@@ -1,21 +1,14 @@
 # TODO
-# when kill is pressed, it would be good if the toggle buttons reset somehow
-# there is a weird shift in leds, fix thecenter at least
-# sort out the global/const thing, especially with the arduino ports getting stuck
 # identify and report the issue with the button toggle array not loading without a page refresh
 # maybe figure out how to avoide the cameraon Observable, it isn't really used here at all
 #
 # Important:
-# mount and try everything on the RPIs for real (how to connect it to the picam)
-# connect all the LED and Arduino mechanism when the buttons are done
+# connect all the fans Arduino mechanism when the buttons are done
 # And hard:
 # figure out how to do the wind speeds reports: MultiUserApp.jl
 #
 # Good:
 # Do I even need to move everything to the Genie infrastructure with routes and modules etc
-# can/should I use a quasar image instead of <img />
-# And hard:
-# put the setInterval is in the right place
 
 import Base.kill
 
