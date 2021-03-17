@@ -1,0 +1,80 @@
+title = "tests"
+experimenters = ["Yakir Gagnon"]
+
+[[setups]]
+label = "4 corners"
+
+[[setups.stars]]
+intensity = 255
+elevation = 1
+radius = 0
+cardinal = "NE"
+
+[[setups.stars]]
+intensity = 255
+elevation = 1
+radius = 0
+cardinal = "SW"
+
+[[setups.stars]]
+intensity = 255
+elevation = 1
+radius = 0
+cardinal = "SE"
+
+[[setups.stars]]
+intensity = 255
+elevation = 1
+radius = 0
+cardinal = "NW"
+
+[[setups]]
+label = "NE center"
+
+[[setups.stars]]
+intensity = 255
+elevation = 71
+radius = 0
+cardinal = "NE"
+
+[[setups]]
+label = "SW center"
+
+[[setups.stars]]
+intensity = 255
+elevation = 71
+radius = 0
+cardinal = "SW"
+
+[[setups]]
+label = "SE center"
+
+[[setups.stars]]
+intensity = 255
+elevation = 71
+radius = 0
+cardinal = "SE"
+
+[[setups]]
+label = "NW center"
+
+[[setups.stars]]
+intensity = 255
+elevation = 71
+radius = 0
+cardinal = "NW"
+
+[[setups]]
+label = "cross"
+
+[[setups.stars]]
+intensity = 1
+elevation = 71
+radius = 200
+cardinal = "NE"
+
+[[setups.stars]]
+intensity = 255
+elevation = 71
+radius = 200
+cardinal = "NW"
