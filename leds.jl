@@ -19,7 +19,7 @@ function star2leds(s::Star)
     striphalf = Int(s.cardinal)
     base = isodd(striphalf) ?  s.elevation - 1 : liveleds - s.elevation
     secondstrip = Int(striphalf ≥ 3)
-    extra = secondstrip*ledsperstrip
+    extra = secondstrip*ledsperstrip - 1
     μ = base + extra
     m = secondstrip*ledsperstrip
     M = (1 + secondstrip)*ledsperstrip - 1
