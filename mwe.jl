@@ -31,6 +31,7 @@ using DataStructures
 using HTTP
 using FFMPEG_jll, ImageMagick, FileIO
 using LibSerialPort
+using COBS
 
 # export start_camera, killcam, getframe, SZ, FPS
 
@@ -39,7 +40,6 @@ mkpath(DATADIR)
 const nicolas = Base.Libc.gethostname() == "nicolas"
 const bucket = nicolas ? "nicolas-cage-skyroom" : "top-floor-skyroom2"
 
-include("cobs.jl")
 include("types.jl")
 
 include("camera.jl")

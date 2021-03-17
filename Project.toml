@@ -1,4 +1,5 @@
 [deps]
+COBS = "51d40088-776c-571e-837e-515b83a6b6e6"
 DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
 FFMPEG_jll = "b22a6f82-2f65-5046-a5b2-351ab43fb4e5"
 FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
