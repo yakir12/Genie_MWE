@@ -1,13 +1,9 @@
 # TODO
-# identify and report the issue with the button toggle array not loading without a page refresh
-# maybe figure out how to avoide the cameraon Observable, it isn't really used here at all
-#
-# Important:
-# connect all the fans Arduino mechanism when the buttons are done
-# And hard:
+# build, connect, and test the fans
 # figure out how to do the wind speeds reports: MultiUserApp.jl
 #
-# Good:
+# identify and report the issue with the button toggle array not loading without a page refresh
+# maybe figure out how to avoid the cameraon Observable, it isn't really used here at all
 # Do I even need to move everything to the Genie infrastructure with routes and modules etc
 
 import Base.kill
@@ -44,25 +40,6 @@ include("check_setups.jl")
 include("abstractarduino.jl")
 include("leds.jl")
 
-# Base.@kwdef mutable struct SkyRoom <: ReactiveModel
-#     kill::R{Bool} = false
-#     buttons::R{Vector{Dict{Symbol, Any}}} = Dict{Symbol, Any}[]
-#     pressed::R{Dict{String, Any}} = Dict{String, Any}()
-#     recording::R{Bool} = false
-#     record_label::R{String} = "Not recording"
-#     timestamp::R{DateTime} = now()
-#     experiment::R{String} = "Unknown"
-#     experimenters::R{Vector{String}} = String[]
-#     beetleid::R{String} = ""
-#     comment::R{String} = ""
-#     folder::R{PosixPath} = p""
-#     save::R{Bool} = false
-#     disable_save::R{Bool} = true
-#     backup::R{Bool} = false
-#     backedup::R{Float64} = 0.0
-#     msg::R{String} = ""
-# end
-
 Base.@kwdef struct SkyRoom <: ReactiveModel
     cameraon::R{Bool} = true
     imageurl::R{String} = IMG_FILE
@@ -83,54 +60,6 @@ Base.@kwdef struct SkyRoom <: ReactiveModel
     backedup::R{Float64} = 0.0
     msg::R{String} = ""
 end
-
-# struct SkyRoom <: ReactiveModel
-#     kill::R{Bool}
-#     buttons::R{Vector{Dict{Symbol, Any}}}
-#     pressed::R{Dict{String, Any}}
-#     recording::R{Bool}
-#     record_label::R{String}
-#     timestamp::R{DateTime}
-#     experiment::R{String}
-#     experimenters::Ref{Vector{String}}
-#     beetleid::R{String}
-#     comment::R{String}
-#     folder::Ref{PosixPath}
-#     save::R{Bool}
-#     disable_save::R{Bool}
-#     backup::R{Bool}
-#     backedup::R{Float64}
-#     msg::R{String}
-#     setuplog::SetupLog
-#
-#     function SkyRoom()
-#         kill = R(false)
-#         buttons = R(Dict{Symbol, Any}[])
-#         pressed = R(Dict{String, Any}())
-#         recording = R(false)
-#         record_label = R("")
-#         timestamp = R(now())
-#         experiment = R("Unknown")
-#         experimenters = Ref(String[])
-#         beetleid = R("")
-#         comment = R("")
-#         folder = Ref(p"")
-#         save = R(false)
-#         disable_save = R(true)
-#         backup = R(false)
-#         backedup = R(0.0)
-#         msg = R("")
-#
-#         onany(experiment, timestamp) do experiment, timestamp
-#             folder[] = DATADIR / string(experiment, "_", timestamp)
-#         end
-#         on(recording) do tf
-#             record_label[] = tf ? "Recording" : "Not recording"
-#         end
-#
-#         new(kill, buttons, pressed, recording, record_label, timestamp, experiment, experimenters, beetleid, comment, folder, save, disable_save, backup, backedup, msg)
-#     end
-# end
 
 function remove_dead_clients(timer)
     for (ch, clients) in Genie.WebChannels.subscriptions()
