@@ -2,9 +2,14 @@ fanports = ["/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_957353530323510
 
 FAN_SP = LibSerialPort.open.(fanports, 9600)
 
-update_l(w::Winds) = encode.(FAN_SP, w.speeds)
+function setpwm(sp, pwm)
+    sp_flush(sp, SP_BUF_INPUT)
+    encode(sp, pwm)
+end
 
-killfans() = encode.(FAN_SP, 0x00)
+update_l(w::Winds) = setpwm.(FAN_SP, w.speeds)
+
+killfans() = setpwm.(FAN_SP, 0x00)
 
 #=
 # tosecond(t::T) where {T <: TimePeriod}= t/convert(T, Second(1))
