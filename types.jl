@@ -21,11 +21,11 @@ end
 MilkyWay(d::Dict) = MilkyWay(d["intensity"], d["cardinal"], d["brightest"], d["contrast"])
 
 struct Winds
-    speeds::NTuple{5, Int}
+    speeds::NTuple{5, UInt8}
 end
 
 function Winds(ds::Vector{Dict})
-    winds = zeros(Int, 5)
+    winds = zeros(UInt8, 5)
     for d in ds
         i = d["id"]
         winds[i] = d["speed"]

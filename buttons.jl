@@ -1,7 +1,7 @@
 function killall()
     kill_lights()
     model.pressed[] = Dict{String, Any}("label" => "")
-    # kill the fans 
+    killfans()
 end
 
 function toggle_record(recording) 

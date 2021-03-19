@@ -4,6 +4,8 @@ FAN_SP = LibSerialPort.open.(fanports, 9600)
 
 update_l(w::Winds) = encode.(FAN_SP, w.speeds)
 
+killfans() = encode.(FAN_SP, 0x00)
+
 #=
 # tosecond(t::T) where {T <: TimePeriod}= t/convert(T, Second(1))
 # sincestart(t) = tosecond(t - t₀[])
