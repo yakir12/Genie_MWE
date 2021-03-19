@@ -40,6 +40,8 @@ include("check_setups.jl")
 include("abstractarduino.jl")
 include("leds.jl")
 
+include("fans.jl")
+
 Base.@kwdef struct SkyRoom <: ReactiveModel
     cameraon::R{Bool} = true
     imageurl::R{String} = IMG_FILE
