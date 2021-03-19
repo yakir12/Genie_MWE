@@ -11,13 +11,6 @@ _getcardinal(txt) = Cardinal(findfirst(==(txt), string.(instances(Cardinal))))
 
 Star(d::Dict) = Star(_getcardinal(d["cardinal"]), d["elevation"], d["intensity"], get(d, "radius", 0))
 
-struct Wind
-    id::Int
-    speed::Int
-end
-
-Wind(d::Dict) = Wind(d["id"], d["speed"])
-
 struct MilkyWay
     intensity::Int
     cardinal::String
@@ -27,17 +20,30 @@ end
 
 MilkyWay(d::Dict) = MilkyWay(d["intensity"], d["cardinal"], d["brightest"], d["contrast"])
 
+struct Winds
+    speeds::NTuple{5, Int}
+end
+
+function Winds(ds::Vector{Dict})
+    winds = zeros(Int, 5)
+    for d in ds
+        i = d["id"]
+        winds[i] = d["speed"]
+    end
+    return Winds((winds...))
+end
+
 struct Setup
     label::String
     stars::Vector{Star}
-    winds::Vector{Wind}
+    winds::Winds
     milky_ways::Vector{MilkyWay}
 end
 
-Setup(d::Dict) = Setup(d["label"], 
-                         haskey(d, "stars") ? Star.(d["stars"]) : Star[], 
-                         haskey(d, "winds") ? Wind.(d["winds"]) : Wind[], 
-                         haskey(d, "milky_ways") ? MilkyWay.(d["milky_ways"]) : MilkyWay[])
+Setup(d::Dict) = Setup(d["label"],
+                       haskey(d, "stars") ? Star.(d["stars"]) : Star[Star(NE, 1, 0, 0)], 
+                       haskey(d, "winds") ? Winds(d["winds"]) : Winds(ntuple(zero, 5)), 
+                       haskey(d, "milky_ways") ? MilkyWay.(d["milky_ways"]) : MilkyWay[])
 
 # Setup() = Setup("", Star[], Wind[], MilkyWay[])
 

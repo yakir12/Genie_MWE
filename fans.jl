@@ -1,3 +1,10 @@
+fanports = ["/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_957353530323510141D0-if00", "/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_95635333930351917172-if00", "/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_95735353032351010260-if00", "/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_55838323435351213041-if00", "/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_957353530323514121D0-if00"]
+
+FAN_SP = LibSerialPort.open.(fanports, 9600)
+
+update_l(w::Winds) = encode.(FAN_SP, w.speeds)
+
+#=
 # tosecond(t::T) where {T <: TimePeriod}= t/convert(T, Second(1))
 # sincestart(t) = tosecond(t - t₀[])
 
@@ -37,20 +44,10 @@ function update_rpm!(sp, c, pwm, msg, rpm)
     end
 end
 
-function isconnected(port)
-    try 
-        sp = LibSerialPort.open(port, baudrate[])
-        close(sp)
-        true
-    catch ex
-        false
-    end
-end
 
-mutable struct FanArduino <: AbstractArduino
+struct FanArduino <: AbstractArduino
     id::Int
     c::ReentrantLock
-    port::String
     sp::SerialPort
     msg::Vector{UInt8}
     rpm::Vector{Union{Missing, Float64}}
@@ -64,7 +61,7 @@ mutable struct FanArduino <: AbstractArduino
         end
         msg = Vector{UInt8}(undef, 12)
         rpm = Vector{Float64}(undef, 3)
-        new(id, c, port, sp, msg, rpm, pwm)
+        new(id, c, sp, msg, rpm, pwm)
     end
 end
 
@@ -72,7 +69,7 @@ update_rpm!(a::FanArduino) = update_rpm!(a.sp, a.c, a.pwm, a.msg, a.rpm)
 
 get_rpm(a::FanArduino) = a.rpm
 
-mutable struct AllWind
+struct AllWind
     arduinos::Vector{FanArduino}
     io::IOStream
     framerate::Int
@@ -83,15 +80,14 @@ mutable struct AllWind
     end
 end
 
-function get_rpms(allwind::AllWind)
+=##=function get_rpms(allwind::AllWind)
     @sync for a in allwind.arduinos
         @async update_rpm!(a)
     end
     now() => get_rpm.(allwind.arduinos)
-end
+end=##=
 
 function record(allwind::AllWind, folder)
-    !isdir(folder) && mkpath(folder)
     isopen(allwind.io) && close(allwind.io)
     allwind.io = open(folder / "fans.csv", "w")
     println(allwind.io, "time,", join([join(["fan$(a.id)_speed$j" for j in 1:3], ",") for a in allwind.arduinos], ","))
@@ -104,3 +100,9 @@ end
 Base.isopen(allwind::AllWind) = all(isopen, allwind.arduinos)
 Base.close(allwind::AllWind) = close.(allwind.arduinos)
 
+fanports = ["/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_957353530323510141D0-if00", "/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_95635333930351917172-if00", "/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_95735353032351010260-if00", "/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_55838323435351213041-if00", "/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_957353530323514121D0-if00"]
+fanarduinos = FanArduino.(fanports, 1:5)
+allwind = AllWind(fanarduinos, 1)
+
+function update_l(w::Wind)
+=#
