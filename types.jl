@@ -30,7 +30,7 @@ function Winds(ds::Vector{Dict})
         i = d["id"]
         winds[i] = d["speed"]
     end
-    return Winds((winds...))
+    return Winds(NTuple{5, UInt8}(winds))
 end
 
 struct Setup
