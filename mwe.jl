@@ -80,12 +80,12 @@ end
 const SETLOG = SetupLog()
 const CAM = Camera()
 const model = Stipple.init(SkyRoom(), debounce=1) 
-const timer = Ref(Timer(1.0))
+# const timer = Ref(Timer(1.0))
 
 function restart()
 
-    close(timer[])
-    timer[] = Timer(remove_dead_clients, 1; interval=60)
+    # close(timer[])
+    # timer[] = Timer(remove_dead_clients, 1; interval=60)
 
     # on(model.cameraon) do ison
     #     ison ? play(CAM) : kill(CAM)
