@@ -24,7 +24,7 @@ struct Winds
     speeds::NTuple{5, UInt8}
 end
 
-function Winds(ds::Vector{Dict})
+function Winds(ds::Vector)
     winds = zeros(UInt8, 5)
     for d in ds
         i = d["id"]
