@@ -1,15 +1,51 @@
-fanports = ["/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_957353530323510141D0-if00", "/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_95635333930351917172-if00", "/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_95735353032351010260-if00", "/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_55838323435351213041-if00", "/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_957353530323514121D0-if00"]
-
-FAN_SP = LibSerialPort.open.(fanports, 9600)
-
-function setpwm(sp, pwm)
-    sp_flush(sp, SP_BUF_INPUT)
-    encode(sp, pwm)
+struct Fan
+    sp::SerialPort
+    c::ReentrantLock
+    Fan(port::String) = Fan(LibSerialPort.open.(port, 9600), ReentrantLock())
 end
 
-update_l(w::Winds) = setpwm.(FAN_SP, w.speeds)
+setpwm(f::Fan, pwm::UInt8) = lock(f.c) do 
+    for _ in 1:3
+        sp_flush(f.sp, SP_BUF_INPUT)
+        encode(f.sp, pwm)
+        sleep(0.1)
+    end
+end
 
-killfans() = setpwm.(FAN_SP, 0x00)
+function toint(msg)
+    y = zero(UInt32)
+    for c in msg
+        y <<= 8
+        y += c
+    end
+    return y
+end
+
+const top_rpm = 12650
+const t4 = 15000000
+const shortest_t = t4/1.1top_rpm
+
+t2rpm(t) = t < shortest_t ?  missing : t4/t
+
+getrpm(f::Fan) = loack(f.c) do
+    sp_flush(f.sp, SP_BUF_OUTPUT)
+    msg = decode(f.sp) 
+    t2rpm.(toint.(Iterators.partition(msg, 4)))
+end
+
+killfan(f::Fan) = setpwm(f, 0x00)
+
+fanports = ["/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_957353530323510141D0-if00", "/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_95635333930351917172-if00", "/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_95735353032351010260-if00", "/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_55838323435351213041-if00", "/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_957353530323514121D0-if00"]
+
+const FANS = Tuple(Fan.(fanports))
+Fans = NTuple{5, Fan}
+
+killfans() = foreach(killfan, FANS)
+
+update_l(w::Winds) = foreach(setpwm, FANS, w.speeds)
+
+getrpms() = getrpms.(FANS)
+
 
 #=
 # tosecond(t::T) where {T <: TimePeriod}= t/convert(T, Second(1))
