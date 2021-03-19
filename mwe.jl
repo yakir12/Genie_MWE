@@ -196,7 +196,7 @@ Genie.config.server_host = "0.0.0.0"
 
 restart()
 
-up()
+up(8082)
 # up(open_browser = true)
 
 
