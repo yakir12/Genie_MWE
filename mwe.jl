@@ -37,7 +37,6 @@ include("setuplogs.jl")
 include("buttons.jl")
 include("check_setups.jl")
 
-include("abstractarduino.jl")
 include("leds.jl")
 
 include("fans.jl")
