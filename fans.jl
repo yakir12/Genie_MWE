@@ -13,13 +13,21 @@ const shortest_t = t4/1.1top_rpm
 
 t2rpm(t) = t < shortest_t ?  missing : t4/t
 
-function getrpm(c, sp) 
-    msg = lock(c) do
-        sp_flush(sp, SP_BUF_OUTPUT)
-        decode(sp) 
-    end
-    t2rpm.(toint.(Iterators.partition(msg, 4)))
+__getmsg(c, sp) = lock(c) do
+    sp_flush(sp, SP_BUF_OUTPUT)
+    decode(sp) 
 end
+
+function _getmsg(c, sp)
+    msg = __getmsg(c, sp)
+    while length(msg) ≠ 12
+        sleep(0.1)
+        msg = __getmsg(c, sp)
+    end
+    return msg
+end
+
+getrpm(c, sp) = NTuple{3, Float64}(t2rpm.(toint.(Iterators.partition(_getmsg(c, sp), 4))))
 
 struct Fan
     sp::SerialPort
