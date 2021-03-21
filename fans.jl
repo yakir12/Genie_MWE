@@ -29,6 +29,9 @@ struct Fan
         sp = LibSerialPort.open.(port, 9600)
         c = ReentrantLock()
         rpm = Ref(Tuple(zeros(3)))
+        while !isopen(sp)
+            sleep(0.1)
+        end
         @async while isopen(sp)
             rpm[] = getrpm(c, sp)
             sleep(1)
