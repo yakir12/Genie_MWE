@@ -27,16 +27,18 @@ function _getmsg(c, sp)
     return msg
 end
 
-getrpm(c, sp) = NTuple{3, Float64}(t2rpm.(toint.(Iterators.partition(_getmsg(c, sp), 4))))
+const RPM3 = NTuple{3, Union{Missing, Float64}}
+
+getrpm(c, sp) = RPM3(t2rpm.(toint.(Iterators.partition(_getmsg(c, sp), 4))))
 
 struct Fan
     sp::SerialPort
     c::ReentrantLock
-    rpm::Ref{NTuple{3, Float64}}
+    rpm::Ref{RPM3}
     function Fan(port::String) 
         sp = LibSerialPort.open.(port, 9600)
         c = ReentrantLock()
-        rpm = Ref(Tuple(zeros(3)))
+        rpm = Ref{RPM3}(Tuple(zeros(3)))
         while !isopen(sp)
             sleep(0.1)
         end
