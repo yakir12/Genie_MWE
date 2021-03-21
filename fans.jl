@@ -61,7 +61,7 @@ update_l(w::Winds) = foreach(setpwm, FANS, w.speeds)
 
 getrpms() = getrpm.(FANS)
 
-const FAN_IO = REF(open(tempname(), "w"))
+const FAN_IO = Ref(open(tempname(), "w"))
 close(FAN_IO[])
 
 function recordfans(folder)
