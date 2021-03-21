@@ -12,9 +12,10 @@ function toggle_record(recording)
         mkpath(model.folder[])
         sleep(0.1)
         record(CAM, model.folder[] / "video.h264")
-        # record(allwind, model.folder[])
+        recordfans(model.folder[])
     else
         play(CAM)
+        close(FAN_IO[])
     end
 end
 

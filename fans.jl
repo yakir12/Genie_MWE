@@ -1,17 +1,3 @@
-struct Fan
-    sp::SerialPort
-    c::ReentrantLock
-    Fan(port::String) = Fan(LibSerialPort.open.(port, 9600), ReentrantLock())
-end
-
-setpwm(f::Fan, pwm::UInt8) = lock(f.c) do 
-    for _ in 1:3
-        sp_flush(f.sp, SP_BUF_INPUT)
-        encode(f.sp, pwm)
-        sleep(0.1)
-    end
-end
-
 function toint(msg)
     y = zero(UInt32)
     for c in msg
@@ -21,17 +7,46 @@ function toint(msg)
     return y
 end
 
-const top_rpm = 12650
+top_rpm = 12650
 const t4 = 15000000
 const shortest_t = t4/1.1top_rpm
 
 t2rpm(t) = t < shortest_t ?  missing : t4/t
 
-getrpm(f::Fan) = loack(f.c) do
-    sp_flush(f.sp, SP_BUF_OUTPUT)
-    msg = decode(f.sp) 
+function getrpm(c, sp) 
+    msg = loack(c) do
+        sp_flush(sp, SP_BUF_OUTPUT)
+        decode(sp) 
+    end
     t2rpm.(toint.(Iterators.partition(msg, 4)))
 end
+
+struct Fan
+    sp::SerialPort
+    c::ReentrantLock
+    rpm::Ref{NTuple{3, Float64}}
+    function Fan(port::String) 
+        sp = LibSerialPort.open.(port, 9600)
+        c = ReentrantLock()
+        rpm = Ref(Tuple(rand(3)))
+        @async while isopen(sp)
+            rpm[] = getrpm(c, sp)
+            sleep(1)
+        end
+        Fan(sp, c, rpm)
+    end
+end
+
+getrpm(f::Fan) = f.rpm[]
+
+setpwm(f::Fan, pwm::UInt8) = lock(f.c) do 
+    for _ in 1:3
+        sp_flush(f.sp, SP_BUF_INPUT)
+        encode(f.sp, pwm)
+        sleep(0.01)
+    end
+end
+
 
 killfan(f::Fan) = setpwm(f, 0x00)
 
@@ -44,8 +59,19 @@ killfans() = foreach(killfan, FANS)
 
 update_l(w::Winds) = foreach(setpwm, FANS, w.speeds)
 
-getrpms() = getrpms.(FANS)
+getrpms() = getrpm.(FANS)
 
+const FAN_IO = REF(open(tempname(), "w"))
+close(FAN_IO[])
+
+function recordfans(folder)
+    FAN_IO[] = open(folder / "fans.csv", "w")
+    println(FAN_IO[], "time,", join([join(["fan$(i)_speed$j" for j in 1:3], ",") for i in 1:5], ","))
+    @async while isopen(FAN_IO[])
+        println(FAN_IO[], now(), ",",join(Iterators.flatten(get_rpms()), ","))
+        sleep(1)
+    end
+end
 
 #=
 # tosecond(t::T) where {T <: TimePeriod}= t/convert(T, Second(1))
