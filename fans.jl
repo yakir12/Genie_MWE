@@ -59,7 +59,7 @@ killfans() = foreach(killfan, FANS)
 
 update_l(w::Winds) = foreach(setpwm, FANS, w.speeds)
 
-getrpms() = getrpm.(FANS)
+getrpms() = join(Iterators.flatten(getrpm.(FANS)), ",")
 
 const FAN_IO = Ref(open(tempname(), "w"))
 close(FAN_IO[])
@@ -68,7 +68,7 @@ function recordfans(folder)
     FAN_IO[] = open(folder / "fans.csv", "w")
     println(FAN_IO[], "time,", join([join(["fan$(i)_speed$j" for j in 1:3], ",") for i in 1:5], ","))
     @async while isopen(FAN_IO[])
-        println(FAN_IO[], now(), ",",join(Iterators.flatten(get_rpms()), ","))
+        println(FAN_IO[], now(), ",", getrpms())
         sleep(1)
     end
 end
