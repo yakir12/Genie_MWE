@@ -11,7 +11,7 @@ top_rpm = 12650
 const t4 = 15000000
 const shortest_t = t4/1.1top_rpm
 
-t2rpm(t) = t < shortest_t ?  missing : t4/t
+t2rpm(t) = t < shortest_t ?  0.0 : t4/t
 
 __getmsg(c, sp) = lock(c) do
     sp_flush(sp, SP_BUF_OUTPUT)
@@ -27,7 +27,7 @@ function _getmsg(c, sp)
     return msg
 end
 
-const RPM3 = NTuple{3, Union{Missing, Float64}}
+const RPM3 = NTuple{3, Float64}
 
 getrpm(c, sp) = RPM3(t2rpm.(toint.(Iterators.partition(_getmsg(c, sp), 4))))
 
