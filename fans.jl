@@ -14,7 +14,7 @@ const shortest_t = t4/1.1top_rpm
 t2rpm(t) = t < shortest_t ?  missing : t4/t
 
 function getrpm(c, sp) 
-    msg = loack(c) do
+    msg = lock(c) do
         sp_flush(sp, SP_BUF_OUTPUT)
         decode(sp) 
     end
@@ -28,7 +28,7 @@ struct Fan
     function Fan(port::String) 
         sp = LibSerialPort.open.(port, 9600)
         c = ReentrantLock()
-        rpm = Ref(Tuple(rand(3)))
+        rpm = Ref(Tuple(zeros(3)))
         @async while isopen(sp)
             rpm[] = getrpm(c, sp)
             sleep(1)
