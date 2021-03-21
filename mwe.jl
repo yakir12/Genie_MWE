@@ -107,7 +107,7 @@ function restart()
         update_l.(setup.stars)
         # update_l.(setup.milky_ways)
         fixcenter_l()
-        encode(LED_SP, LEDS)
+        write(LED_SP, LEDS)
         update_l(setup.winds)
     end
 end

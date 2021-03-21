@@ -32,5 +32,5 @@ const LED_SP = LibSerialPort.open(ledports[Base.Libc.gethostname()], 9600, mode 
 
 function kill_lights()
     reset_l()
-    encode(LED_SP, LEDS)
+    write(LED_SP, LEDS)
 end
