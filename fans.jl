@@ -33,7 +33,7 @@ struct Fan
             rpm[] = getrpm(c, sp)
             sleep(1)
         end
-        Fan(sp, c, rpm)
+        new(sp, c, rpm)
     end
 end
 
