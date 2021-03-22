@@ -156,7 +156,7 @@ function ui()
                                                           ])),
                               row(cell(class="st-module", [
                                                            p(btn("Kill", @click(:kill), icon = "close", color="negative")),
-                                                           p(quasar(:uploader, accept = ".toml", auto__upload = true, hide__upload__btn = true, label = "Upload Setup file", url = "upload")),
+                                                           p(quasar(:uploader, auto__upload = true, hide__upload__btn = true, label = "Upload Setup file", url = "upload")),
                                                            p(quasar(:btn__toggle, "", @bind("pressed"), color = "secondary", toggle__color="primary", :multiple, options=:buttons))
                                                           ])),
                               row(cell(class="st-module", [
