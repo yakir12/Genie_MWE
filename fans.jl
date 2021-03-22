@@ -11,29 +11,42 @@ top_rpm = 12650
 const t4 = 15000000
 const shortest_t = t4/1.1top_rpm
 
-t2rpm(t) = t < shortest_t ?  missing : t4/t
+t2rpm(t) = t < shortest_t ?  0.0 : t4/t
 
-function getrpm(c, sp) 
-    msg = loack(c) do
-        sp_flush(sp, SP_BUF_OUTPUT)
-        decode(sp) 
-    end
-    t2rpm.(toint.(Iterators.partition(msg, 4)))
+__getmsg(c, sp) = lock(c) do
+    sp_flush(sp, SP_BUF_OUTPUT)
+    decode(sp) 
 end
+
+function _getmsg(c, sp)
+    msg = __getmsg(c, sp)
+    while length(msg) ≠ 12
+        sleep(0.1)
+        msg = __getmsg(c, sp)
+    end
+    return msg
+end
+
+const RPM3 = NTuple{3, Float64}
+
+getrpm(c, sp) = RPM3(t2rpm.(toint.(Iterators.partition(_getmsg(c, sp), 4))))
 
 struct Fan
     sp::SerialPort
     c::ReentrantLock
-    rpm::Ref{NTuple{3, Float64}}
+    rpm::Ref{RPM3}
     function Fan(port::String) 
         sp = LibSerialPort.open.(port, 9600)
         c = ReentrantLock()
-        rpm = Ref(Tuple(rand(3)))
+        rpm = Ref{RPM3}(Tuple(zeros(3)))
+        while !isopen(sp)
+            sleep(0.1)
+        end
         @async while isopen(sp)
             rpm[] = getrpm(c, sp)
             sleep(1)
         end
-        Fan(sp, c, rpm)
+        new(sp, c, rpm)
     end
 end
 
@@ -59,16 +72,16 @@ killfans() = foreach(killfan, FANS)
 
 update_l(w::Winds) = foreach(setpwm, FANS, w.speeds)
 
-getrpms() = getrpm.(FANS)
+getrpms() = join(Iterators.flatten(getrpm.(FANS)), ",")
 
-const FAN_IO = REF(open(tempname(), "w"))
+const FAN_IO = Ref(open(tempname(), "w"))
 close(FAN_IO[])
 
 function recordfans(folder)
     FAN_IO[] = open(folder / "fans.csv", "w")
     println(FAN_IO[], "time,", join([join(["fan$(i)_speed$j" for j in 1:3], ",") for i in 1:5], ","))
     @async while isopen(FAN_IO[])
-        println(FAN_IO[], now(), ",",join(Iterators.flatten(get_rpms()), ","))
+        println(FAN_IO[], now(), ",", getrpms())
         sleep(1)
     end
 end

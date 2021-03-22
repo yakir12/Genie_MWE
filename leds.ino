@@ -1,34 +1,32 @@
 #include <Adafruit_DotStar.h>
-#include <PacketSerial.h>
 
-PacketSerial_<COBS, 0, 350> myPacketSerial;
-
-#define NUMPIXELS 300 
+#define NUMPIXELS 300
 #define DATAPIN    4
 #define CLOCKPIN   5
 Adafruit_DotStar strip(NUMPIXELS, DATAPIN, CLOCKPIN, DOTSTAR_BGR);
 
+word index = 0;
+unsigned long prev = millis();
+
 void setup() {
-    myPacketSerial.begin(9600);
-    myPacketSerial.setStream(&Serial);
-    myPacketSerial.setPacketHandler(&onPacketReceived);
-  
-    strip.begin();
-    strip.clear();
-    strip.show();
+  Serial.begin(115200);
+
+  strip.begin();
+  strip.clear();
+  strip.show();
 }
 
 void loop() {
-    myPacketSerial.update();
-}
-
-void onPacketReceived(const uint8_t* buffer, size_t size)
-{
-    strip.clear();
-    for (int i = 0; i < size; i++) {
-      if (buffer[i] > 0) {
-        strip.setPixelColor(i, 0, buffer[i], 0);
-      }
+  if (Serial.available() > 0) {
+    if (millis() - prev > 1000) {
+      index = 0;
     }
+    strip.setPixelColor(index, 0, Serial.read(), 0);
+    index++;
+    prev = millis();
+  }
+  if (index >= NUMPIXELS) {
     strip.show();
+    index = 0;
+  }
 }
