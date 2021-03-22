@@ -39,16 +39,18 @@ include("check_setups.jl")
 
 include("leds.jl")
 
-include("fans.jl")
+nicolas && include("fans.jl")
 
 Base.@kwdef struct SkyRoom <: ReactiveModel
     cameraon::R{Bool} = true
+    camera_label::R{String} = "Camera on"
     imageurl::R{String} = IMG_FILE
     kill::R{Bool} = false
     buttons::R{Vector{Dict{Symbol, Any}}} = Dict{Symbol, Any}[]
     pressed::R{Dict{String, Any}} = Dict{String, Any}("label" => "")
     recording::R{Bool} = false
     record_label::R{String} = "Not recording"
+    disable_record::R{Bool} = false
     timestamp::R{DateTime} = now()
     title::R{String} = "Unknown"
     experimenters::R{Vector{String}} = String[]
@@ -80,15 +82,29 @@ const SETLOG = SetupLog()
 const CAM = Camera()
 const model = Stipple.init(SkyRoom(), debounce=1) 
 const timer = Ref(Timer(1.0))
+const cam_timer = Ref(Timer(1.0))
+
+check_on_camera(_) = if process_exited(CAM.process[])
+    model.cameraon[] = false
+end
 
 function restart()
 
     close(timer[])
     timer[] = Timer(remove_dead_clients, 1; interval=60)
 
-    # on(model.cameraon) do ison
-    #     ison ? play(CAM) : kill(CAM)
-    # end
+    cam_timer[] = Timer(check_on_camera, 1; interval = 1)
+
+    on(model.recording) do _
+        if !model.cameraon[]
+            model.cameraon[] = true
+        end
+    end
+
+    on(model.cameraon) do ison
+        model.camera_label[] = ison ? "Camera on" : "Camera off"
+        ison ? play(CAM) : kill(CAM)
+    end
     onany(model.title, model.timestamp) do title, timestamp
         model.folder[] = DATADIR / string(title, "_", timestamp)
     end
@@ -150,7 +166,7 @@ function ui()
                                                           ])),
                               row(cell(class="st-module", [
                                                            quasar(:img, "", src=:imageurl, :basic, style="height: $(CAM.sz)px; max-width: $(CAM.sz)px"),
-                                                           # p(toggle("Camera on", fieldname = :cameraon)),
+                                                           p([toggle("", fieldname = :cameraon, checked__icon="play_arrow", unchecked__icon="stop"), span("", @text(:camera_label))]),
                                                            # """ <img id="frame" src="frame" style="height: $(CAM.sz)px; max-width: $(CAM.sz)px" /> """
                                                           ])),
                               row(cell(class="st-module", [
@@ -159,7 +175,7 @@ function ui()
                                                            p(quasar(:btn__toggle, "", @bind("pressed"), color = "secondary", toggle__color="primary", :multiple, options=:buttons))
                                                           ])),
                               row(cell(class="st-module", [
-                                                           p([toggle("", fieldname = :recording, checked__icon="fiber_manual_record", unchecked__icon="stop"), span("", @text(:record_label))]),
+                                                           p([toggle("", fieldname = :recording, checked__icon="fiber_manual_record", unchecked__icon="stop", disabled = :disable_record), span("", @text(:record_label))]),
                                                            p(["Beetle ID ", input("", label = "ID", placeholder="Type in the ID of the beetle", @bind(:beetleid))]),
                                                            p(["Comment ", input("", placeholder="Type in any comments", @bind(:comment), :autogrow)]),
                                                            p(btn("Save", @click(:save), disabled = :disable_save, icon = "save", color="primary")),

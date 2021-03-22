@@ -40,8 +40,8 @@ end
 snap() = HTTP.Messages.Response(200, read(IMG_FILE))
 
 function Camera()
-    sz = 640
-    fps = 5
+    sz = 320
+    fps = 4
     process = Ref(play(fps, sz))
     Camera(process, sz, fps)
 end

@@ -16,6 +16,7 @@ function toggle_record(recording)
     else
         play(CAM)
         close(FAN_IO[])
+        model.disable_record[] = true
     end
 end
 
@@ -34,6 +35,7 @@ function save()
     model.comment[] = ""
     model.beetleid[] = ""
     model.timestamp[] = now()
+    model.disable_record[] = false
 end
 
 _n2backup() = count(isdir, readpath(DATADIR))
