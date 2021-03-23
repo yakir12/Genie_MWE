@@ -44,10 +44,12 @@ function backup()
     n = _n2backup()
     model.backedup[] = 0.0
     for folder in readpath(DATADIR)
-        tmp = Tar.create(string(folder))
-        rm(folder, recursive = true)
-        name = basename(folder)
-        run(`aws s3 mv $tmp s3://$bucket/$name.tar --quiet`)
-        model.backedup[] = 100 - 100_n2backup()/n
+        if isdir(folder)
+            tmp = Tar.create(string(folder))
+            rm(folder, recursive = true)
+            name = basename(folder)
+            run(`aws s3 mv $tmp s3://$bucket/$name.tar --quiet`)
+            model.backedup[] = 100 - 100_n2backup()/n
+        end
     end
 end
