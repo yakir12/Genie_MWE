@@ -28,7 +28,8 @@ end
 
 ledports = Dict("eira" => "/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_95735353032351F0F0F0-if00", "nicolas" => "/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_757353036313519070B1-if00", "sheldon" => "/dev/serial/by-id/usb-1a86_USB2.0-Serial-if00-port0")
 
-const LED_SP = LibSerialPort.open(ledports[Base.Libc.gethostname()], 115200, mode = SP_MODE_WRITE)
+baudrate = nicolas ? 115200 : 9600 # TODO: fix the ardiuino in sheldon
+const LED_SP = LibSerialPort.open(ledports[Base.Libc.gethostname()], baudrate, mode = SP_MODE_WRITE)
 
 function kill_lights()
     reset_l()
