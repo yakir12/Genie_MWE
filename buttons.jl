@@ -1,6 +1,6 @@
 function killall()
     kill_lights()
-    killfans()
+    nicolas && killfans()
     model.pressed[] = Dict{String, Any}("label" => "")
 end
 
@@ -12,10 +12,10 @@ function toggle_record(recording)
         mkpath(model.folder[])
         sleep(0.1)
         record(CAM, model.folder[] / "video.h264")
-        recordfans(model.folder[])
+        nicolas && recordfans(model.folder[])
     else
         play(CAM)
-        close(FAN_IO[])
+        nicolas && close(FAN_IO[])
         model.disable_record[] = true
     end
 end

@@ -1,5 +1,4 @@
 # TODO
-# backedup never finishes
 # move to skyroom repo etc
 # fix the video hell
 # disable_record when saved hasn't been pressed yet
@@ -132,7 +131,7 @@ function restart()
         # update_l.(setup.milky_ways)
         fixcenter_l()
         write(LED_SP, LEDS)
-        update_l(setup.winds)
+        nicolas && update_l(setup.winds)
     end
 end
 
