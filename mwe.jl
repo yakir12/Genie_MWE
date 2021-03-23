@@ -117,7 +117,13 @@ function restart()
     on(toggle_record, model.recording)
     onbutton(killall, model.kill)
     onbutton(save, model.save)
-    onbutton(backup, model.backup)
+    on(model.backup) do tf
+        if tf
+            backup()
+            model.backup[] = false
+        end
+    end
+    # onbutton(backup, model.backup)
 
     on(model.pressed) do d
         setup = Setup(d)
