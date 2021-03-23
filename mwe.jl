@@ -1,4 +1,5 @@
 # TODO
+# add some label in the website to indicate which system/room this is in
 # build, connect, and test the fans
 # figure out how to do the wind speeds reports: MultiUserApp.jl
 #
