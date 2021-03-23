@@ -1,5 +1,4 @@
 # TODO
-# add some label in the website to indicate which system/room this is in
 # build, connect, and test the fans
 # figure out how to do the wind speeds reports: MultiUserApp.jl
 #
@@ -161,7 +160,7 @@ this.badtoml();
 
 function ui()
     m = dashboard(vm(model), [
-                              heading("SkyRoom"),
+                              heading("SkyRoom on $(Base.Libc.gethostname())"),
                               row(cell(class="st-module", [
                                                            p(h1(span("", @text(:title)))),
                                                           ])),
