@@ -50,5 +50,4 @@ function backup()
         run(`aws s3 mv $tmp s3://$bucket/$name.tar --quiet`)
         model.backedup[] = 100 - 100_n2backup()/n
     end
-    model.backedup[] = 100.0
 end

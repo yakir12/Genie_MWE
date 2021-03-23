@@ -1,10 +1,12 @@
 # TODO
-# build, connect, and test the fans
+# backedup never finishes
+# move to skyroom repo etc
+# fix the video hell
+# disable_record when saved hasn't been pressed yet
 # figure out how to do the wind speeds reports: MultiUserApp.jl
-#
 # identify and report the issue with the button toggle array not loading without a page refresh
-# maybe figure out how to avoid the cameraon Observable, it isn't really used here at all
 # Do I even need to move everything to the Genie infrastructure with routes and modules etc
+# learn how to flash the arduino remotely
 
 import Base.kill
 
