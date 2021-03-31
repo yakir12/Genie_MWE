@@ -1,4 +1,5 @@
 # TODO
+# improve on how you deal with the differences between sheldon and nicolas...
 # move to skyroom repo etc
 # fix the video hell
 # disable_record when saved hasn't been pressed yet
@@ -164,6 +165,15 @@ msg: function () {
 this.badtoml();
 }
 """
+
+# css() = style("""
+#               :root.stipple-blue body.body--dark{
+#               --st-dashboard-module: #4e4e4e;
+#               --st-dashboard-line: #a2a2a2;
+#               --st-dashboard-bg: #616367;
+#               --st-slider--track: #aab2b2;
+#               }
+#               """)
 
 function ui()
     m = dashboard(vm(model), [

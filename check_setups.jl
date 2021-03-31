@@ -45,10 +45,14 @@ function _check1(x::Dict)
 end
 _check1(x) = ""
 
+const badchar = ('\\', '/', ':', '*', '?', '"', '<', '>', '|')
+_good_name(x) = all(!in(badchar), x)
+
 _checksetups(::TOML.ParserError) = "bad TOML formatting"
 function _checksetups(ds)
     isempty(ds) && return "file was empty"
     (haskey(ds, "title") && !isempty(ds["title"])) || return "missing experiment title"
+    _good_name(ds["title"]) || return "experiment title may not include: $(join(badchar, " "))"
     (haskey(ds, "experimenters") && !isempty(ds["experimenters"])) || return "missing experimenters' names"
     (haskey(ds, "setups") && !isempty(ds["setups"])) || return "missing setups"
     msgs = _check1.(ds["setups"])
