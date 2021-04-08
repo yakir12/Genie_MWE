@@ -78,3 +78,10 @@ intensity = 255
 elevation = 71
 radius = 200
 cardinal = "NW"
+
+[[setups]]
+label = "milkyway"
+
+[[setups.milky_ways]]
+intensity = 10000
+cardinals = ["SE", "NW"]

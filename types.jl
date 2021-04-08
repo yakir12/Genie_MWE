@@ -12,13 +12,11 @@ _getcardinal(txt) = Cardinal(findfirst(==(txt), string.(instances(Cardinal))))
 Star(d::Dict) = Star(_getcardinal(d["cardinal"]), d["elevation"], d["intensity"], get(d, "radius", 0))
 
 struct MilkyWay
-    intensity::Int
-    cardinal::String
-    brightest::String
-    contrast::Float64
+    intensity::Float64
+    cardinals::Tuple{Cardinal, Cardinal}
 end
 
-MilkyWay(d::Dict) = MilkyWay(d["intensity"], d["cardinal"], d["brightest"], d["contrast"])
+MilkyWay(d::Dict) = MilkyWay(d["intensity"], Tuple(_getcardinal.(d["cardinals"])))
 
 struct Winds
     speeds::NTuple{5, UInt8}

@@ -36,3 +36,20 @@ function kill_lights()
     reset_l()
     write(LED_SP, LEDS)
 end
+
+clump(x::T) where {T <: Real} = x > 255 ? T(255) : x
+
+function update_l(m::MilkyWay)
+    mw = copy(MILKYWAY)
+    mw .*= m.intensity
+    map!(clump, mw, mw)
+    i1, i2 = Int.(m.cardinals)
+    if i1 > i2
+        reverse!(mw)
+    end
+    if i1 < 3
+        LEDS[1:141] .= mw
+    else
+        LEDS[151:150 + 141] .= mw
+    end
+end

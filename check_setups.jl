@@ -32,6 +32,10 @@ _starradius(_) = false
 _starelevation(x::Integer) = 1 ≤ x ≤ 71
 _starelevation(_) = false
 
+_milkywayintensity(x::Real) = 0 ≤ x
+_milkywayintensity(_) = false
+_milkywaycardinal(x::Vector{String}) = length(x) == 2 && (("NE" ∈ x && "SW" ∈ x) || ("NW" ∈ x && "SE" ∈ x))
+
 function _check1(x::Dict)
     msg = IOBuffer()
     haskey(x, "label") || println(msg, "missing label")
@@ -41,6 +45,7 @@ function _check1(x::Dict)
     !isempty(strange) && println(msg, "I do not recognize: $(join(strange, ", "))")
     _check4s(get(x, "winds", missing), Dict("id" => _windid, "speed" => _windspeed), "wind", msg) 
     _check4s(get(x, "stars", missing), Dict("intensity" => _starintensity, "cardinal" => _starcardinal, "radius" => _starradius, "elevation" => _starelevation), "star", msg) 
+    _check4s(get(x, "milky_ways", missing), Dict("intensity" => _milkywayintensity, "cardinals" => _milkywaycardinal), "milky_way", msg) 
     return String(take!(msg))
 end
 _check1(x) = ""

@@ -10,6 +10,7 @@
 
 import Base.kill
 
+using Serialization
 using Stipple, StippleUI
 using Genie.Renderer.Html
 using TOML
@@ -30,6 +31,7 @@ const DATADIR = home() / "mnt" / "data"
 mkpath(DATADIR)
 const nicolas = Base.Libc.gethostname() == "nicolas"
 const bucket = nicolas ? "nicolas-cage-skyroom" : "top-floor-skyroom2"
+const MILKYWAY = deserialize("milkyway_vector")
 
 include("types.jl")
 
@@ -129,7 +131,7 @@ function restart()
         setup = Setup(d)
         reset_l()
         update_l.(setup.stars)
-        # update_l.(setup.milky_ways)
+        update_l.(setup.milky_ways)
         fixcenter_l()
         write(LED_SP, LEDS)
         nicolas && update_l(setup.winds)
