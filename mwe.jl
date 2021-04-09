@@ -137,7 +137,7 @@ function restart()
         update_l.(setup.stars)
         fixcenter_l()
         for led in LEDS, i in Tuple(led)
-            write(LED_SP, i)
+            write(LED_SP, reinterpret(UInt8, i))
         end
         nicolas && update_l(setup.winds)
     end

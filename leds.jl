@@ -37,7 +37,7 @@ Base.Tuple(c::RGB) = (red(c), green(c), blue(c))
 function kill_lights()
     reset_l()
     for led in LEDS, i in Tuple(led)
-        write(LED_SP, i)
+        write(LED_SP, reinterpret(UInt8, i))
     end
 end
 
