@@ -53,6 +53,6 @@ function update_l(m::MilkyWay)
     end
     inds = i1 < 3 ? UnitRange(1,141) : UnitRange(151,150 + 141)
     for (i, j) in enumerate(inds)
-        LEDS[j] = RGB{N0f8}(HSV(m.hue, m.saturation, mv[i]))
+        LEDS[j] = RGB{N0f8}(HSV(m.hue, m.saturation, mw[i]))
     end
 end
