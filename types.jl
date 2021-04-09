@@ -3,20 +3,24 @@
 struct Star
     cardinal::Cardinal
     elevation::Int
-    intensity::Int
+    color::RGB{N0f8}
     radius::Int
 end
 
 _getcardinal(txt) = Cardinal(findfirst(==(txt), string.(instances(Cardinal))))
 
-Star(d::Dict) = Star(_getcardinal(d["cardinal"]), d["elevation"], d["intensity"], get(d, "radius", 0))
+_getcolor(d) = haskey(d, "intensity") ? RGB{N0f8}(0, d["intensity"]/255, 0) : RGB{N0f8}((d["rgb"]/255)...) 
+
+Star(d::Dict) = Star(_getcardinal(d["cardinal"]), d["elevation"], _getcolor(d), get(d, "radius", 0))
 
 struct MilkyWay
     intensity::Float64
+    hue::Int # Hue in [0,360)
+    saturation::Float64 # Saturation in [0,1]
     cardinals::Tuple{Cardinal, Cardinal}
 end
 
-MilkyWay(d::Dict) = MilkyWay(d["intensity"], Tuple(_getcardinal.(d["cardinals"])))
+MilkyWay(d::Dict) = MilkyWay(d["intensity"], get(d, "hue", 0), get(d, "saturation", 0.0), Tuple(_getcardinal.(d["cardinals"])))
 
 struct Winds
     speeds::NTuple{5, UInt8}

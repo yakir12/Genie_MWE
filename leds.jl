@@ -2,9 +2,9 @@ const ledsperstrip = 150
 deadleds = 9
 const liveleds = ledsperstrip - deadleds
 const centerled = (liveleds - 1)÷2 + 1
-const LEDS = zeros(UInt8, 2ledsperstrip)
+const LEDS = zeros(RGB, 2ledsperstrip)
 
-reset_l() = fill!(LEDS, 0x00)
+reset_l() = fill!(LEDS, zero(RGB))
 
 function update_l(s::Star)
     striphalf = Int(s.cardinal)
@@ -17,13 +17,13 @@ function update_l(s::Star)
     i1 = max(m, μ - s.radius)
     i2 = min(M, μ + s.radius)
     for i in i1:i2
-        LEDS[i] = s.intensity
+        LEDS[i] = s.color
     end
 end
 
-fixcenter_l() = if LEDS[centerled] > 0
+fixcenter_l() = if LEDS[centerled] ≠ zero(RGB)
     LEDS[centerled + ledsperstrip - 1] = LEDS[centerled]
-    LEDS[centerled] = 0x00
+    LEDS[centerled] = zero(RGB)
 end
 
 ledports = Dict("eira" => "/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_95735353032351F0F0F0-if00", "nicolas" => "/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_757353036313519070B1-if00", "sheldon" => "/dev/serial/by-id/usb-1a86_USB2.0-Serial-if00-port0")
@@ -32,12 +32,16 @@ ledports = Dict("eira" => "/dev/serial/by-id/usb-Arduino__www.arduino.cc__0043_9
 baudrate = 115200
 const LED_SP = LibSerialPort.open(ledports[Base.Libc.gethostname()], baudrate, mode = SP_MODE_WRITE)
 
+Base.Tuple(c::RGB) = (red(c), green(c), blue(c))
+
 function kill_lights()
     reset_l()
-    write(LED_SP, LEDS)
+    for led in LEDS, i in Tuple(led)
+        write(LED_SP, i)
+    end
 end
 
-clump(x) = x > 255 ? UInt8(255) : round(UInt8, x)
+clump(x) = x < 0 ? 0.0 : x > 255 ? 1.0 : x/255
 
 function update_l(m::MilkyWay)
     mw = copy(MILKYWAY)
@@ -47,9 +51,8 @@ function update_l(m::MilkyWay)
     if i1 > i2
         reverse!(mw)
     end
-    if i1 < 3
-        LEDS[1:141] .= mw
-    else
-        LEDS[151:150 + 141] .= mw
+    inds = i1 < 3 ? 1:141 : 151:150 + 141
+    for (i, j) in enumerate(inds)
+        LEDS[j] = RGB{N0f8}(HSV(m.hue, m.saturation, mv[i]))
     end
 end

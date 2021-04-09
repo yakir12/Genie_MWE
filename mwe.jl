@@ -25,6 +25,9 @@ using FFMPEG_jll, ImageMagick, FileIO
 using LibSerialPort
 using COBS
 
+using Colors, ColorVectorSpace
+import Colors.N0f8
+
 # export start_camera, killcam, getframe, SZ, FPS
 
 const DATADIR = home() / "mnt" / "data"
@@ -130,10 +133,12 @@ function restart()
     on(model.pressed) do d
         setup = Setup(d)
         reset_l()
-        update_l.(setup.stars)
         update_l.(setup.milky_ways)
+        update_l.(setup.stars)
         fixcenter_l()
-        write(LED_SP, LEDS)
+        for led in LEDS, i in Tuple(led)
+            write(LED_SP, i)
+        end
         nicolas && update_l(setup.winds)
     end
 end
