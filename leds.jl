@@ -37,7 +37,7 @@ function kill_lights()
     write(LED_SP, LEDS)
 end
 
-clump(x::T) where {T <: Real} = x > 255 ? T(255) : x
+clump(x) = x > 255 ? UInt8(255) : round(UInt8, x)
 
 function update_l(m::MilkyWay)
     mw = copy(MILKYWAY)
