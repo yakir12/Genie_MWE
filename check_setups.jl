@@ -11,8 +11,8 @@ _check4s(::Missing, fieldfun, thing, msg) = nothing
 _check4s(dicts, fieldfun, thing, msg) = for dict in dicts
     ks = keys(dict)
     fields = keys(fieldfun)
-    strange = filter(!∈(fields), ks)
-    !isempty(strange) && println(msg, "in $thing, I do not recognize: $(join(strange, ", "))")
+    # strange = filter(!∈(fields), ks)
+    # !isempty(strange) && println(msg, "in $thing, I do not recognize: $(join(strange, ", "))")
     for (field, fun) in fieldfun
         _check4(msg, dict, thing, field, fun)
     end
