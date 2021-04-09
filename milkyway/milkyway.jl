@@ -29,7 +29,8 @@ end
 # this is the calibration function.
 # TODO: replace this with a real function
 # right now it just maxes ourt the intensity
-int2uint(x) = 255x/4.362195807446645e6
+m, M = (1.3828504591649722e6, 4.362195807446645e6)
+int2uint(x) = x < m ? 0.0 : 255(x - m)/(M - m)
 
 # this is a vector with 141 elements (0-180° elevation) that should populate the 300 element LED messege vector that is sent to the Arduino
 milkyway = int2uint.(int)
