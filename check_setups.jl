@@ -44,8 +44,8 @@ function _check1(x::Dict)
     strange = filter(!∈(["label", "stars", "winds", "milky_ways"]), ks)
     !isempty(strange) && println(msg, "I do not recognize: $(join(strange, ", "))")
     _check4s(get(x, "winds", missing), Dict("id" => _windid, "speed" => _windspeed), "wind", msg) 
-    _check4s(get(x, "stars", missing), Dict("intensity" => _starintensity, "cardinal" => _starcardinal, "radius" => _starradius, "elevation" => _starelevation), "star", msg) 
-    _check4s(get(x, "milky_ways", missing), Dict("intensity" => _milkywayintensity, "cardinals" => _milkywaycardinal), "milky_way", msg) 
+    _check4s(get(x, "stars", missing), Dict("cardinal" => _starcardinal, "elevation" => _starelevation), "star", msg) 
+    _check4s(get(x, "milky_ways", missing), Dict("cardinals" => _milkywaycardinal), "milky_way", msg) 
     return String(take!(msg))
 end
 _check1(x) = ""

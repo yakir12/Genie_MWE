@@ -20,7 +20,7 @@ struct MilkyWay
     cardinals::Tuple{Cardinal, Cardinal}
 end
 
-MilkyWay(d::Dict) = MilkyWay(d["intensity"], get(d, "hue", 0), get(d, "saturation", 0.0), Tuple(_getcardinal.(d["cardinals"])))
+MilkyWay(d::Dict) = MilkyWay(get(d, "intensity", 1.0), get(d, "hue", 0), get(d, "saturation", 0.0), Tuple(_getcardinal.(d["cardinals"])))
 
 struct Winds
     speeds::NTuple{5, UInt8}
