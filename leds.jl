@@ -56,3 +56,7 @@ function update_l(m::MilkyWay)
         LEDS[j] = RGB{N0f8}(HSV(m.hue, m.saturation, mw[i]))
     end
 end
+
+function update_l(m::Calibration)
+    LEDS[1:141] .= CALIBRATION
+end

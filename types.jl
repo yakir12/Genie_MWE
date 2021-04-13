@@ -22,6 +22,10 @@ end
 
 MilkyWay(d::Dict) = MilkyWay(get(d, "intensity", 1.0), get(d, "hue", 0), get(d, "saturation", 0.0), Tuple(_getcardinal.(d["cardinals"])))
 
+struct Calibration end
+
+Calibration(d::Dict) = Calibration()
+
 struct Winds
     speeds::NTuple{5, UInt8}
 end
@@ -40,12 +44,14 @@ struct Setup
     stars::Vector{Star}
     winds::Winds
     milky_ways::Vector{MilkyWay}
+    calibrations::Vector{Calibration}
 end
 
 Setup(d::Dict) = Setup(d["label"],
                        haskey(d, "stars") ? Star.(d["stars"]) : Star[Star(NE, 1, 0, 0)], 
                        haskey(d, "winds") ? Winds(d["winds"]) : Winds(ntuple(zero, 5)), 
-                       haskey(d, "milky_ways") ? MilkyWay.(d["milky_ways"]) : MilkyWay[])
+                       haskey(d, "milky_ways") ? MilkyWay.(d["milky_ways"]) : MilkyWay[],
+                       haskey(d, "calibrations") ? Calibration.(d["calibrations"]) : Calibration[])
 
 # Setup() = Setup("", Star[], Wind[], MilkyWay[])
 

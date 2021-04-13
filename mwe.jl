@@ -35,6 +35,7 @@ mkpath(DATADIR)
 const nicolas = Base.Libc.gethostname() == "nicolas"
 const bucket = nicolas ? "nicolas-cage-skyroom" : "top-floor-skyroom2"
 const MILKYWAY = deserialize("milkyway_vector")
+const CALIBRATION = RGB.(Gray.(reinterpret.(N0f8, deserialize("calibration_vector"))))
 
 include("types.jl")
 
@@ -133,6 +134,7 @@ function restart()
     on(model.pressed) do d
         setup = Setup(d)
         reset_l()
+        update_l.(setup.calibrations)
         update_l.(setup.milky_ways)
         update_l.(setup.stars)
         fixcenter_l()

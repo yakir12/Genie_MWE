@@ -85,3 +85,8 @@ label = "milkyway"
 [[setups.milky_ways]]
 intensity = 10000
 cardinals = ["SE", "NW"]
+
+[[setups]]
+label = "Calibrate"
+
+[[setups.calibrations]]
