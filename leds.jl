@@ -12,8 +12,8 @@ function update_l(s::Star)
     secondstrip = striphalf ≥ 3
     extra = secondstrip ? ledsperstrip : 0
     μ = base + extra
-    m = secondstrip ? ledsperstrip : 1
-    M = secondstrip ? ledsperstrip + liveleds - 1 : liveleds 
+    m = secondstrip ? ledsperstrip + 1 : 1
+    M = secondstrip ? ledsperstrip + liveleds : liveleds 
     i1 = max(m, μ - s.radius)
     i2 = min(M, μ + s.radius)
     for i in i1:i2
