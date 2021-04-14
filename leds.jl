@@ -13,7 +13,7 @@ function update_l(s::Star)
     extra = secondstrip ? (nicolas ? ledsperstrip - 1 : ledsperstrip) : 0
     μ = base + extra
     m = secondstrip ? (nicolas ? ledsperstrip : ledsperstrip + 1) : 1
-    M = secondstrip ? (nicolas ? ledsperstrip + liveleds - 1: ledsperstrip + liveleds) : liveleds 
+    M = secondstrip ? (nicolas ? ledsperstrip + liveleds - 1 : ledsperstrip + liveleds) : liveleds 
     i1 = max(m, μ - s.radius)
     i2 = min(M, μ + s.radius)
     for i in i1:i2
