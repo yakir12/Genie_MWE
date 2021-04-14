@@ -10,7 +10,7 @@ function update_l(s::Star)
     striphalf = Int(s.cardinal)
     base = isodd(striphalf) ?  s.elevation : liveleds - s.elevation + 1
     secondstrip = striphalf ≥ 3
-    extra = secondstrip ? (nicolas ? ledsperstrip - 1 : ledsperstrip) : 0
+    extra = secondstrip ? (nicolas ? ledsperstrip - 1 : ledsperstrip) : 0 # fix these following lines, they check to see if you are in nicolas and adjust the length of the first strip, it seems like it's one LED short, so the address of all the following LEDs in the second strip are -1.
     μ = base + extra
     m = secondstrip ? (nicolas ? ledsperstrip : ledsperstrip + 1) : 1
     M = secondstrip ? (nicolas ? ledsperstrip + liveleds - 1 : ledsperstrip + liveleds) : liveleds 
