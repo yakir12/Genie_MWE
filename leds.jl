@@ -10,7 +10,7 @@ function update_l(s::Star)
     striphalf = Int(s.cardinal)
     base = isodd(striphalf) ?  s.elevation : liveleds - s.elevation + 1
     secondstrip = striphalf ≥ 3
-    extra = secondstrip ? ledsperstrip -1 : 0
+    extra = secondstrip ? ledsperstrip : 0
     μ = base + extra
     m = secondstrip ? ledsperstrip : 1
     M = secondstrip ? ledsperstrip + liveleds - 1 : liveleds 

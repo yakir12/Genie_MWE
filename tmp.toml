@@ -90,3 +90,43 @@ cardinals = ["SE", "NW"]
 label = "Calibrate"
 
 [[setups.calibrations]]
+
+[[setups]]
+label = "4 corners and center"
+
+[[setups.stars]]
+intensity = 255
+elevation = 71
+radius = 1
+cardinal = "NE"
+
+[[setups.stars]]
+intensity = 255
+elevation = 71
+radius = 1
+cardinal = "NW"
+
+[[setups.stars]]
+intensity = 255
+elevation = 1
+radius = 0
+cardinal = "NE"
+
+[[setups.stars]]
+intensity = 255
+elevation = 1
+radius = 0
+cardinal = "SW"
+
+[[setups.stars]]
+intensity = 255
+elevation = 1
+radius = 0
+cardinal = "SE"
+
+[[setups.stars]]
+intensity = 255
+elevation = 1
+radius = 0
+cardinal = "NW"
+
