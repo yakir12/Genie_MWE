@@ -201,10 +201,10 @@ function ui()
                                                            p(quasar(:btn__toggle, "", @bind("pressed"), color = "secondary", toggle__color="primary", :multiple, options=:buttons))
                                                           ])),
                               row(cell(class="st-module", [
-                                                           p([toggle("", fieldname = :recording, checked__icon="fiber_manual_record", unchecked__icon="stop", disabled = :disable_record), span("", @text(:record_label))]),
+                                                           p([toggle("", fieldname = :recording, checked__icon="fiber_manual_record", unchecked__icon="stop", disable = :disable_record), span("", @text(:record_label))]),
                                                            p(["Beetle ID ", input("", label = "ID", placeholder="Type in the ID of the beetle", @bind(:beetleid))]),
                                                            p(["Comment ", input("", placeholder="Type in any comments", @bind(:comment), :autogrow)]),
-                                                           p(btn("Save", @click(:save), disabled = :disable_save, icon = "save", color="primary")),
+                                                           p(btn("Save", @click(:save), disable = :disable_save, icon = "save", color="primary")),
                                                            p(btn("Backup", "", @click(:backup), icon = "cloud_upload", percentage = :backedup, loading = :backup, color="primary")),
                                                           ]))
                              ], title = "SkyRoom")
