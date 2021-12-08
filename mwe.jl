@@ -135,6 +135,7 @@ function restart()
     on(model.restart) do tf
         if tf
             @info "restart!"
+            run(`sudo reboot -h now`)
             model.restart[] = false
         end
     end
