@@ -216,7 +216,7 @@ function ui()
                                                            p(btn("Backup", "", @click(:backup), icon = "cloud_upload", percentage = :backedup, loading = :backup, color="primary")),
                                                           ])),
                               row(cell(class="st-module", [
-                                                           p(btn("Restart", "", @click(:restart), icon = "restart", color="negative")),
+                                                           p(btn("Restart", "", @click(:restart), icon = "restart_alt", color="negative")),
                                                           ]))
                              ], title = "SkyRoom")
 
