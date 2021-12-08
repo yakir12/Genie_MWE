@@ -70,6 +70,7 @@ Base.@kwdef struct SkyRoom <: ReactiveModel
     backup::R{Bool} = false
     backedup::R{Float64} = 0.0
     msg::R{String} = ""
+    restart::R{Bool} = false
 end
 
 function remove_dead_clients(timer)
@@ -131,6 +132,12 @@ function restart()
     end
     # onbutton(backup, model.backup)
 
+    on(model.restart) do tf
+        if tf
+            @info "restart!"
+            model.restart[] = false
+        end
+    end
     on(model.pressed) do d
         setup = Setup(d)
         reset_l()
@@ -206,6 +213,9 @@ function ui()
                                                            p(["Comment ", input("", placeholder="Type in any comments", @bind(:comment), :autogrow)]),
                                                            p(btn("Save", @click(:save), disable = :disable_save, icon = "save", color="primary")),
                                                            p(btn("Backup", "", @click(:backup), icon = "cloud_upload", percentage = :backedup, loading = :backup, color="primary")),
+                                                          ])),
+                              row(cell(class="st-module", [
+                                                           p(btn("Restart", "", @click(:restart), icon = "restart", color="negative")),
                                                           ]))
                              ], title = "SkyRoom")
 
