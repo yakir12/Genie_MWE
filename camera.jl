@@ -18,9 +18,7 @@ function kill(c::Camera)
     end
 end
 
-play(fps, sz) = ffmpeg() do exe
-    run(`$exe -y -hide_banner -loglevel error -f v4l2 -r $fps -i /dev/video0 -vf "crop=in_h:in_h,scale=$(sz)x$sz" -update 1 $IMG_FILE`, wait = false)
-end
+play(fps, sz) = run(`$(ffmpeg()) -y -hide_banner -loglevel error -f v4l2 -r $fps -i /dev/video0 -vf "crop=in_h:in_h,scale=$(sz)x$sz" -update 1 $IMG_FILE`, wait = false)
 
 function play(c::Camera)
     kill(c)
@@ -28,9 +26,7 @@ function play(c::Camera)
 end
 
 
-record(fps, sz, file) = ffmpeg() do exe
-    run(`$exe -y -hide_banner -loglevel error -f v4l2 -i /dev/video0 -filter_complex '[0:v]crop=in_h:in_h,split=2[out1][out2]' -map '[out1]' $file -map '[out2]' -s $(sz)x$sz -r $fps -update 1 $IMG_FILE`, wait = false)
-end
+record(fps, sz, file) = run(`$(ffmpeg()) -y -hide_banner -loglevel error -f v4l2 -i /dev/video0 -filter_complex '[0:v]crop=in_h:in_h,split=2[out1][out2]' -map '[out1]' $file -map '[out2]' -s $(sz)x$sz -r $fps -update 1 $IMG_FILE`, wait = false)
 
 function record(c::Camera, file)
     kill(c)
