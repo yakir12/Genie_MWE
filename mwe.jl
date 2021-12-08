@@ -35,7 +35,7 @@ mkpath(DATADIR)
 const nicolas = Base.Libc.gethostname() == "nicolas"
 const bucket = nicolas ? "nicolas-cage-skyroom" : "top-floor-skyroom2"
 const MILKYWAY = deserialize(joinpath(@__DIR__(), "milkyway_vector"))
-const CALIBRATION = RGB.(Gray.(reinterpret.(N0f8, deserialize("calibration_vector"))))
+const CALIBRATION = RGB.(Gray.(reinterpret.(N0f8, joinpath(@__DIR__(), deserialize("calibration_vector")))))
 
 include(joinpath(@__DIR__(), "types.jl"))
 
