@@ -37,17 +37,17 @@ const bucket = nicolas ? "nicolas-cage-skyroom" : "top-floor-skyroom2"
 const MILKYWAY = deserialize("milkyway_vector")
 const CALIBRATION = RGB.(Gray.(reinterpret.(N0f8, deserialize("calibration_vector"))))
 
-include("types.jl")
+include(joinpath(@__DIR__(), "types.jl"))
 
-include("camera.jl")
-include("setuplogs.jl")
+include(joinpath(@__DIR__(), "camera.jl"))
+include(joinpath(@__DIR__(), "setuplogs.jl"))
 
-include("buttons.jl")
-include("check_setups.jl")
+include(joinpath(@__DIR__(), "buttons.jl"))
+include(joinpath(@__DIR__(), "check_setups.jl"))
 
-include("leds.jl")
+include(joinpath(@__DIR__(), "leds.jl"))
 
-nicolas && include("fans.jl")
+nicolas && include(joinpath(@__DIR__(), "fans.jl"))
 
 Base.@kwdef struct SkyRoom <: ReactiveModel
     cameraon::R{Bool} = true
